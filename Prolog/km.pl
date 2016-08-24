@@ -50,8 +50,8 @@ vsum_list([X | Xs], V) :-
 	identity(X, IE),
 	vsum_list([X | Xs], IE, V).
 vsum_list([X | Xs], A, V) :-
-	vsum(X, A, LUL),
-	vsum_list(Xs, LUL, V).
+	vsum(X, A, B),
+	vsum_list(Xs, B, V).
 vsum_list([], V, V).
 
 identity([_ | Xs], [0 | IE]) :-
@@ -60,4 +60,3 @@ identity([], []).
 
 divide(L, Coordinate, Result) :-
 	Result is Coordinate / L.
-	
