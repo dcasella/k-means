@@ -28,7 +28,7 @@
 
 (defun km-r (observations clusters cs)
   (let ((new-clusters (partition observations cs)))
-       (if (equalp clusters new-clusters) new-clusters
+       (if (equal clusters new-clusters) new-clusters
            (km-r observations new-clusters (re-centroids clusters)))))
 
 ;;; Crea k centroidi iniziali, ad esempio usando il metodo di Forgy che sceglie
@@ -70,7 +70,7 @@
 
 ;;; Ricalcola il centroide di ogni gruppo
 (defun re-centroids (clusters)
-  )
+  (mapcar #'centroid clusters))
 
 (defun norm-r (observations c)
   (mapcar #'(lambda (v)
