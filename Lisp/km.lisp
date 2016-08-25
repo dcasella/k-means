@@ -28,8 +28,8 @@
 
 (defun km-r (observations clusters cs)
   (let ((new-clusters (partition observations cs)))
-       (if (equal clusters new-clusters) new-clusters
-           (km-r observations new-clusters (re-centroids clusters)))))
+       (if (equal clusters new-clusters) clusters
+           (km-r observations new-clusters (re-centroids new-clusters)))))
 
 ;;; Crea k centroidi iniziali, ad esempio usando il metodo di Forgy che sceglie
 ;;; casualmente k delle osservazioni iniziali
