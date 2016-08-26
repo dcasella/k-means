@@ -93,8 +93,15 @@ initialize(_, 0, []).
 partition(Observations, CS, Clusters) :-
 	partition_n(Observations, CS, PN),
 	append(PN, FPN),
-	predsort(sort_norm, FPN, New_FPN),
-	partition_a(New_FPN, [], Clusters).
+	%predsort(sort_norm, FPN, New_FPN),
+		%sort_norm(<, [N1, _C1, _V1], [N2, _C2, _V2]) :-
+		%	N1 =< N2, !.
+		%sort_norm(>, [N1, _C1, _V1], [N2, _C2, _V2]) :-
+		%	N1 > N2.
+	sort(FPN, New_FPN),
+	partition_a(New_FPN, [], PA),
+	sort(PA, New_PA),
+	partition_r(New_PA, Clusters).
 
 partition_n(Observations, [C | CS], [NR | Result]) :-
 	!,
@@ -109,11 +116,6 @@ norm_r([V | Observations], C, [[NORM, C, V] | Result]) :-
 	norm_r(Observations, C, Result).
 norm_r([], _, []).
 
-sort_norm(<, [N1, _C1, _V1], [N2, _C2, _V2]) :-
-	N1 =< N2, !.
-sort_norm(>, [N1, _C1, _V1], [N2, _C2, _V2]) :-
-	N1 > N2.
-
 partition_a([[_N, C, V] | Observations], [], [[C, V] | Result]) :-
 	!,
 	partition_a(Observations, [V], Result).
@@ -121,8 +123,10 @@ partition_a([[_N, _C, V] | Observations], Acc, Result) :-
 	member(V, Acc),
 	!,
 	partition_a(Observations, Acc, Result).
-partition_a([[_N, C, V2] | Observations], Acc, [[C, V2] | Result]) :-
-	\+member(V2, Acc),
+partition_a([[_N, C, V] | Observations], Acc, [[C, V] | Result]) :-
+	\+member(V, Acc),
 	!,
-	partition_a(Observations, [V2 | Acc], Result).
+	partition_a(Observations, [V | Acc], Result).
 partition_a([], _, []).
+
+partition_r(L, L).
