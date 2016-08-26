@@ -5,7 +5,7 @@
 
 (defun km (observations k)
   (if (< (length observations) k)
-      (error "Haha get cancer Antoniotti")
+      (error "42")
       (km-r observations NIL (initialize observations k))))
 
 (defun centroid (observations)
@@ -31,14 +31,11 @@
        (if (equal clusters new-clusters) clusters
            (km-r observations new-clusters (re-centroids new-clusters)))))
 
-;;; Crea k centroidi iniziali, ad esempio usando il metodo di Forgy che sceglie
-;;; casualmente k delle osservazioni iniziali
 (defun initialize (observations k)
   (let ((rand (nth (random (length observations)) observations)))
     (if (equalp k 0) NIL
         (cons rand (initialize (remove rand observations) (- k 1))))))
 
-;;; Raggruppa le observations attorno ai k centroidi in cs
 (defun partition (observations cs)
   (partition-r (remove-first (remove-duplicates (sort (partition-n
                                                        observations
@@ -68,13 +65,12 @@
   (append (list (cdr (car observations)))
           (remove-first (rest observations)))))
 
-;;; Ricalcola il centroide di ogni gruppo
-(defun re-centroids (clusters)
-  (mapcar #'centroid clusters))
-
 (defun norm-r (observations c)
   (mapcar #'(lambda (v)
                     (list (norm (vsub v c))
                           c
                           v))
                   observations))
+
+(defun re-centroids (clusters)
+  (mapcar #'centroid clusters))
