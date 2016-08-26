@@ -3,7 +3,14 @@
 
 % Predicati principali
 
-km(_Observations, _K, _Clusters).
+km(Observations, K, Clusters) :-
+	length(Observations, L),
+	L >= K,
+	!,
+	initialize(Observations, K, CS),
+	km_r(Observations, [], CS, Clusters).
+km(_, _, _) :-
+	print_message(error, 42).
 
 centroid(Observations, Centroid) :-
 	vsum_list(Observations, VSUM),
@@ -60,3 +67,62 @@ identity([], []).
 
 divide(L, Coordinate, Result) :-
 	Result is Coordinate / L.
+
+
+
+km_r(Observations, Clusters, CS, New_Clusters) :-
+	partition(Observations, CS, New_Clusters),
+	Clusters \== New_Clusters,
+	!,
+	re_centroids(New_Clusters, New_CS),
+	km_r(Observations, New_Clusters, New_CS, _).
+km_r(_, Clusters, _, Clusters).
+
+initialize(Observations, K, [V | CS]) :-
+	K > 0,
+	!,
+	length(Observations, L),
+	MaxL is L-1,
+	random_between(0, MaxL, N),
+	nth0(N, Observations, V),
+	delete(Observations, V, New_Observations),
+	J is K-1,
+	initialize(New_Observations, J, CS).
+initialize(_, 0, []).
+
+partition(Observations, CS, Clusters) :-
+	partition_n(Observations, CS, PN),
+	append(PN, FPN),
+	predsort(sort_norm, FPN, New_FPN),
+	partition_a(New_FPN, [], Clusters).
+
+partition_n(Observations, [C | CS], [NR | Result]) :-
+	!,
+	norm_r(Observations, C, NR),
+	partition_n(Observations, CS, Result).
+partition_n(_, [], []).
+
+norm_r([V | Observations], C, [[NORM, C, V] | Result]) :-
+	!,
+	vsub(V, C, VSUB),
+	norm(VSUB, NORM),
+	norm_r(Observations, C, Result).
+norm_r([], _, []).
+
+sort_norm(<, [N1, _C1, _V1], [N2, _C2, _V2]) :-
+	N1 =< N2, !.
+sort_norm(>, [N1, _C1, _V1], [N2, _C2, _V2]) :-
+	N1 > N2.
+
+partition_a([[_N, C, V] | Observations], [], [[C, V] | Result]) :-
+	!,
+	partition_a(Observations, [V], Result).
+partition_a([[_N, _C, V] | Observations], Acc, Result) :-
+	member(V, Acc),
+	!,
+	partition_a(Observations, Acc, Result).
+partition_a([[_N, C, V2] | Observations], Acc, [[C, V2] | Result]) :-
+	\+member(V2, Acc),
+	!,
+	partition_a(Observations, [V2 | Acc], Result).
+partition_a([], _, []).
