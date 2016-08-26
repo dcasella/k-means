@@ -26,15 +26,15 @@
 
 ;;; Funzioni ausiliarie
 
-(defun km-r (observations clusters cs)
-  (let ((new-clusters (partition observations cs)))
-       (if (equal clusters new-clusters) clusters
-           (km-r observations new-clusters (re-centroids new-clusters)))))
-
 (defun initialize (observations k)
   (let ((rand (nth (random (length observations)) observations)))
     (if (equalp k 0) NIL
         (cons rand (initialize (remove rand observations) (- k 1))))))
+
+(defun km-r (observations clusters cs)
+  (let ((new-clusters (partition observations cs)))
+       (if (equal clusters new-clusters) clusters
+           (km-r observations new-clusters (re-centroids new-clusters)))))
 
 (defun partition (observations cs)
   (partition-r (remove-first (remove-duplicates (sort (partition-n
@@ -45,15 +45,17 @@
                               :key #'third
                               :from-end t)) cs))
 
-(defun partition-r (observations cs)
-  (if (null cs) NIL
-      (cons (remove-duplicates (partition-a observations (car cs)))
-              (partition-r observations (cdr cs)))))
-
 (defun partition-n (observations cs)
   (if (null cs) NIL
       (append (norm-r observations (car cs))
               (partition-n observations (cdr cs)))))
+
+(defun norm-r (observations c)
+  (mapcar #'(lambda (v)
+                    (list (norm (vsub v c))
+                          c
+                          v))
+                  observations))
 
 (defun partition-a (observations c)
   (if (null observations) NIL
@@ -65,12 +67,10 @@
   (append (list (cdr (car observations)))
           (remove-first (rest observations)))))
 
-(defun norm-r (observations c)
-  (mapcar #'(lambda (v)
-                    (list (norm (vsub v c))
-                          c
-                          v))
-                  observations))
+(defun partition-r (observations cs)
+  (if (null cs) NIL
+      (cons (remove-duplicates (partition-a observations (car cs)))
+              (partition-r observations (cdr cs)))))
 
 (defun re-centroids (clusters)
   (mapcar #'centroid clusters))

@@ -43,41 +43,6 @@ new_vector(Name, Vector) :-
 
 % Predicati ausiliari
 
-vector([X | Vector]) :-
-	number(X),
-	vector(Vector).
-vector([]).
-
-prod([X | Vector1], [Y | Vector2], [Z | V]) :-
-	Z is X * Y,
-	prod(Vector1, Vector2, V).
-prod([], [], []).
-
-vsum_list([X | Xs], V) :-
-	identity(X, IE),
-	vsum_list([X | Xs], IE, V).
-vsum_list([X | Xs], A, V) :-
-	vsum(X, A, B),
-	vsum_list(Xs, B, V).
-vsum_list([], V, V).
-
-identity([_ | Xs], [0 | IE]) :-
-	identity(Xs, IE).
-identity([], []).
-
-divide(L, Coordinate, Result) :-
-	Result is Coordinate / L.
-
-
-
-km_r(Observations, Clusters, CS, New_Clusters) :-
-	partition(Observations, CS, New_Clusters),
-	Clusters \== New_Clusters,
-	!,
-	re_centroids(New_Clusters, New_CS),
-	km_r(Observations, New_Clusters, New_CS, _).
-km_r(_, Clusters, _, Clusters).
-
 initialize(Observations, K, [V | CS]) :-
 	K > 0,
 	!,
@@ -90,18 +55,21 @@ initialize(Observations, K, [V | CS]) :-
 	initialize(New_Observations, J, CS).
 initialize(_, 0, []).
 
+km_r(Observations, Clusters, CS, Result) :-
+	partition(Observations, CS, New_Clusters),
+	Clusters \== New_Clusters,
+	!,
+	re_centroids(New_Clusters, New_CS),
+	km_r(Observations, New_Clusters, New_CS, Result).
+km_r(_, Clusters, _, Clusters).
+
 partition(Observations, CS, Clusters) :-
 	partition_n(Observations, CS, PN),
 	append(PN, FPN),
-	%predsort(sort_norm, FPN, New_FPN),
-		%sort_norm(<, [N1, _C1, _V1], [N2, _C2, _V2]) :-
-		%	N1 =< N2, !.
-		%sort_norm(>, [N1, _C1, _V1], [N2, _C2, _V2]) :-
-		%	N1 > N2.
 	sort(FPN, New_FPN),
 	partition_a(New_FPN, [], PA),
 	sort(PA, New_PA),
-	partition_r(New_PA, Clusters).
+	partition_r(New_PA, [], [], Clusters).
 
 partition_n(Observations, [C | CS], [NR | Result]) :-
 	!,
@@ -129,4 +97,41 @@ partition_a([[_N, C, V] | Observations], Acc, [[C, V] | Result]) :-
 	partition_a(Observations, [V | Acc], Result).
 partition_a([], _, []).
 
-partition_r(L, L).
+partition_r([[C, V] | Observations], [], [], Result) :-
+	!,
+	partition_r(Observations, [C], [V], Result).
+partition_r([[C, V] | Observations], [C | ACC1], ACC2, Result) :-
+	!,
+	partition_r(Observations, [C | ACC1], [V | ACC2], Result).
+partition_r([[C, V] | Observations], _, ACC2, [ACC2 | Result]) :-
+	!,
+	partition_r(Observations, [C], [V], Result).
+partition_r([], _, ACC2, [ACC2]).
+
+re_centroids(Clusters, CS) :-
+	maplist(centroid, Clusters, CS).
+
+vsum_list([X | Xs], V) :-
+	identity(X, IE),
+	vsum_list([X | Xs], IE, V).
+vsum_list([X | Xs], A, V) :-
+	vsum(X, A, B),
+	vsum_list(Xs, B, V).
+vsum_list([], V, V).
+
+identity([_ | Xs], [0 | IE]) :-
+	identity(Xs, IE).
+identity([], []).
+
+divide(L, Coordinate, Result) :-
+	Result is Coordinate / L.
+
+prod([X | Vector1], [Y | Vector2], [Z | V]) :-
+	Z is X * Y,
+	prod(Vector1, Vector2, V).
+prod([], [], []).
+
+vector([X | Vector]) :-
+	number(X),
+	vector(Vector).
+vector([]).
