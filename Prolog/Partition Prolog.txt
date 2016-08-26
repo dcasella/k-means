@@ -1,8 +1,14 @@
 TESTING
 O = [[3.0,7.0],[0.5,1.0],[0.8,0.5],[1.0,8.0],[0.9,1.2],[6.0,4.0],[7.0,5.5],[4.0,9.0],[9.0,4.0]], K = 3, initialize(O, K, CS), partition(O, CS, R).
 
+TESTING CS FISSO
+O = [[3.0,7.0],[0.5,1.0],[0.8,0.5],[1.0,8.0],[0.9,1.2],[6.0,4.0],[7.0,5.5],[4.0,9.0],[9.0,4.0]], CS = [[3.0,7.0],[0.5,1.0],[0.8,0.5]], partition(O, CS, R).
+
 OBSERVATIONS
 [[3.0,7.0],[0.5,1.0],[0.8,0.5],[1.0,8.0],[0.9,1.2],[6.0,4.0],[7.0,5.5],[4.0,9.0],[9.0,4.0]]
+
+CS
+[[3.0,7.0],[0.5,1.0],[0.8,0.5]]
 
 PARTITION_N(OBSERVATIONS, CS, PN)
 [
@@ -103,7 +109,9 @@ PREDSORT(sort_norm, FPN, New_FPN)
 	[9.082400563727631, [0.8, 0.5], [4.0, 9.0]]
 ]
 
-PARTITION_A(NEW_FPN, [], ...)(per ora ... = Clusters, solo per testing, manca il raggruppamento in sotto-liste)
+PARTITION_A(NEW_FPN, [], ...)
+(per ora ... = Clusters, solo per testing, 
+manca il raggruppamento in sotto-liste)
 [
 	[[3.0, 7.0], [3.0, 7.0]],
 	[[0.5, 1.0], [0.5, 1.0]],
@@ -115,3 +123,4 @@ PARTITION_A(NEW_FPN, [], ...)(per ora ... = Clusters, solo per testing, manca il
 	[[3.0, 7.0], [7.0, 5.5]],
 	[[3.0, 7.0], [9.0, 4.0]]
 ]
+
