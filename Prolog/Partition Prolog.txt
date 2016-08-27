@@ -86,7 +86,6 @@ APPEND(PN, FPN)
 	[8.915716460273957, [0.8, 0.5], [9.0, 4.0]]
 ]
 
-PREDSORT(sort_norm, FPN, New_FPN)
 SORT(FPN, New_FPN)
 [
 	[0.0, [3.0, 7.0], [3.0, 7.0]],
@@ -118,9 +117,7 @@ SORT(FPN, New_FPN)
 	[9.082400563727631, [0.8, 0.5], [4.0, 9.0]]
 ]
 
-PARTITION_A(NEW_FPN, [], ...)
-(per ora ... = Clusters, solo per testing,
-manca il raggruppamento in sotto-liste)
+PARTITION_A(NEW_FPN, [], PA)
 [
 	[
 		[3.0, 7.0], [3.0, 7.0]
@@ -182,7 +179,7 @@ SORT(PA, NEW_PA)
 	]
 ]
 
-PARTITION_R(NEW_PA, [], [], CLUSTERS)
+PARTITION_R(NEW_PA, _, [], CLUSTERS)
 [
 	[
 		[0.9, 1.2], [0.5, 1.0]

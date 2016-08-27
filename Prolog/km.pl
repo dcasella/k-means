@@ -97,15 +97,15 @@ partition_a([[_N, C, V] | Observations], Acc, [[C, V] | Result]) :-
 	partition_a(Observations, [V | Acc], Result).
 partition_a([], _, []).
 
-partition_r([[C, V] | Observations], [], [], Result) :-
+partition_r([[C, V] | Observations], _, [], Result) :-
 	!,
-	partition_r(Observations, [C], [V], Result).
-partition_r([[C, V] | Observations], [C | ACC1], ACC2, Result) :-
+	partition_r(Observations, C, [V], Result).
+partition_r([[C, V] | Observations], C, ACC2, Result) :-
 	!,
-	partition_r(Observations, [C | ACC1], [V | ACC2], Result).
+	partition_r(Observations, C, [V | ACC2], Result).
 partition_r([[C, V] | Observations], _, ACC2, [ACC2 | Result]) :-
 	!,
-	partition_r(Observations, [C], [V], Result).
+	partition_r(Observations, C, [V], Result).
 partition_r([], _, ACC2, [ACC2]).
 
 re_centroids(Clusters, CS) :-
