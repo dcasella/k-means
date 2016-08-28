@@ -56,16 +56,13 @@
  Parametro k, numero di clusters da generare.
  Crea k centroidi iniziali usando il metodo di Forgy.
  Metodo di Forgy: sceglie casualmente k delle osservazioni iniziali."
-  ;; Controlla se observations può essere la lista di centroidi
-  (if (eq (length observations) k) observations
+  ;; Caso base: la lista risultante è composta da k vettori
+  (if (= k 0) NIL
       ;; rand = Vettore estratto da observations dato un indice casuale
       (let ((rand (nth (random (length observations)) observations)))
-        ;; Caso base: la lista risultante è composta da k vettori
-        (if (equalp k 0) NIL
             ;; Rimuovi il vettore selezionato da observations
             ;; per non incorrerci nuovamente nelle ricorsioni future
-            (cons rand (initialize (remove rand observations) (- k 1)))))))
-  
+            (cons rand (initialize (remove rand observations) (- k 1))))))
 
 (defun km-r (observations clusters cs)
 "Parametro observations, lista di vettori (ovvero liste).
