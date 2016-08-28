@@ -8,11 +8,14 @@
  Parametro k, numero di clusters da generare.
  Ritorna k clusters dell'insieme di osservazioni observations."
   ;; Controlla se il numero di osservazioni è minore di k
-  (if (< (length observations) k)
-      ;; Errore: impossibile computare i clusters
-      (error "Can't compute clusters.")
-      ;; Prosegui con l'algoritmo
-      (km-r observations NIL (initialize observations k))))
+  (cond ((< (length observations) k)
+          ;; Errore: impossibile computare i clusters
+          (error "Can't compute clusters."))
+        ;; Controlla se non è possibile computare observations
+        ((null observations)
+          NIL)
+        ;; Prosegui con l'algoritmo
+        (T (km-r observations NIL (initialize observations k)))))
 
 (defun centroid (observations)
 "Parametro observations, lista di vettori (ovvero liste).
@@ -53,13 +56,16 @@
  Parametro k, numero di clusters da generare.
  Crea k centroidi iniziali usando il metodo di Forgy.
  Metodo di Forgy: sceglie casualmente k delle osservazioni iniziali."
-  ;; rand = Vettore estratto da observations dato un indice casuale
-  (let ((rand (nth (random (length observations)) observations)))
-    ;; Caso base: la lista risultante è composta da k vettori
-    (if (equalp k 0) NIL
-        ;; Rimuovi il vettore selezionato da observations
-        ;; per non incorrerci nuovamente nelle ricorsioni future
-        (cons rand (initialize (remove rand observations) (- k 1))))))
+  ;; Controlla se observations può essere la lista di centroidi
+  (if (eq (length observations) k) observations
+      ;; rand = Vettore estratto da observations dato un indice casuale
+      (let ((rand (nth (random (length observations)) observations)))
+        ;; Caso base: la lista risultante è composta da k vettori
+        (if (equalp k 0) NIL
+            ;; Rimuovi il vettore selezionato da observations
+            ;; per non incorrerci nuovamente nelle ricorsioni future
+            (cons rand (initialize (remove rand observations) (- k 1)))))))
+  
 
 (defun km-r (observations clusters cs)
 "Parametro observations, lista di vettori (ovvero liste).

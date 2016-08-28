@@ -1,13 +1,13 @@
 Libreria Common Lisp "k-means"
 
 Vettore:
-(coordinata coordinata+)
+(coordinata+)
 Esempio vettore 3D:
 (4.2 42 -0.42)
 
 Osservazioni:
-(vettore vettore+)
-Esempi:
+(vettore+)
+Esempio:
 CL-USER 1 > (defparameter observations '((3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) (0.9 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) (9.0 4.0)))
 OBSERVATIONS
 
