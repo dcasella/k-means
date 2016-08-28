@@ -92,7 +92,7 @@
                                                  #'<
                                                  :key #'car)
                               :key #'third
-                              :from-end t)) cs))
+                              :from-end T)) cs))
 
 (defun partition-n (observations cs)
 "Parametro observations, lista di vettori (ovvero liste).
@@ -100,7 +100,7 @@
  Ritorna la lista di liste di tris (Distanza Centroide Vettore)."
   ;; Caso base: non ci sono centroidi da computare
   (if (null cs) NIL
-      ;; Calcola la lista di Tris per il primo centroide e ricorsivamente
+      ;; Calcola la lista di tris per il primo centroide e ricorsivamente
       ;; per per ogni centroide
       (append (norm-r observations (car cs))
               (partition-n observations (cdr cs)))))
@@ -108,7 +108,7 @@
 (defun norm-r (observations c)
 "Parametro observations, lista di vettori (ovvero liste).
  Parametro c, centroide.
- Calcola la distanza tra ogni vettore di observations ed il vettore c
+ Calcola la distanza tra ogni vettore di observations ed il centroide c,
  e ritorna una lista di tris (Distanza Centroide Vettore)."
   (mapcar #'(lambda (v)
                     (list (norm (vsub v c)) ; Sottrai i due vettori e calcola
@@ -127,7 +127,7 @@
             (remove-first (cdr observations)))))
 
 (defun partition-r (observations cs)
-"Parametro observations, lista di liste di coppie (Centroide Vettore).
+"Parametro observations, lista di coppie (Centroide Vettore).
  Parametro cs, lista di centroidi.
  Ritorna la lista di liste di vettori raggruppati per centroide."
   ;; Caso base: non ci sono centroidi da computare
@@ -138,7 +138,7 @@
               (partition-r observations (cdr cs)))))
 
 (defun partition-a (observations c)
-"Parametro observations, lista di liste di coppie (Centroide Vettore).
+"Parametro observations, lista di coppie (Centroide Vettore).
  Parametro c, centroide.
  Ritorna la lista di vettori appartenenti alle coppie corrispondenti."
   ;; Caso base: non ci sono coppie da computare
