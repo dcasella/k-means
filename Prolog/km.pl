@@ -3,18 +3,30 @@
 
 % Predicati principali
 
+% km/3
+% Parametro Observations, lista di vettori (ovvero liste).
+% Parametro K, numero di clusters da generare.
+% Ritorna K clusters dell'insieme di osservazioni Observations.
 km(Observations, K, Clusters) :-
+	% Controlla che il numero di osservazioni sia maggiore di K
 	length(Observations, L),
 	L >= K,
 	!,
 	initialize(Observations, K, CS),
 	km_r(Observations, [], CS, Clusters).
 km(_, _, _) :-
-	print_message(error, 42).
+	% Errore: impossibile computare i clusters
+	print_message(error, "Can't compute clusters.").
 
+% centroid/2
+% Parametro Observations, lista di vettori (ovvero liste).
+% Calcola il centroide dell'insieme di osservazioni Observations.
 centroid(Observations, Centroid) :-
+  	% Somma (facendo uso di vsum) le osservazioni
 	vsum_list(Observations, VSUM),
 	length(Observations, L),
+	% Dividi ogni coordinata del vettore generato da vsum_list per il
+  	% numero di osservazioni
 	maplist(divide(L), VSUM, Centroid).
 
 vsum([X | Vector1], [Y | Vector2], [Z | V]) :-
@@ -135,3 +147,12 @@ vector([X | Vector]) :-
 	number(X),
 	vector(Vector).
 vector([]).
+
+/*
+make_obs(0, []) :- !.
+make_obs(N, [[X, Y] | Result]) :-
+	random_between(-50, 50, X),
+	random_between(-50, 50, Y),
+	M is N-1,
+	make_obs(M, Result).
+*/
