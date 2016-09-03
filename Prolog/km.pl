@@ -10,10 +10,14 @@
 km(Observations, K, Clusters) :-
 	% Controlla che il numero di osservazioni sia maggiore di K
 	length(Observations, L),
-	L >= K,
+	L > K,
 	!,
 	initialize(Observations, K, CS),
 	km_r(Observations, [], CS, Clusters).
+km(Observations, K, Observations) :-
+	% Se il numero di osservazioni coincide con K, ritorna Observations
+	length(Observations, L),
+	L =:= K, !.
 km(_, _, _) :-
 	% Errore: impossibile computare i clusters
 	print_message(error, "Can't compute clusters.").
@@ -77,37 +81,26 @@ km_r(_, Clusters, _, Clusters).
 
 partition(Observations, CS, Clusters) :-
 	partition_n(Observations, CS, PN),
-	append(PN, FPN),
-	sort(FPN, New_FPN),
-	partition_a(New_FPN, [], PA),
-	sort(PA, New_PA),
-	partition_r(New_PA, [], [], Clusters).
+	sort(PN, SPN),
+	partition_r(SPN, [], [], Clusters).
 
-partition_n(Observations, [C | CS], [NR | Result]) :-
+partition_n([V | Observations], CS, [NR | Result]) :-
 	!,
-	norm_r(Observations, C, NR),
+	current_prolog_flag(max_tagged_integer, MAX),
+	norm_r(V, CS, MAX, [], NR),
 	partition_n(Observations, CS, Result).
-partition_n(_, [], []).
+partition_n([], _, []).
 
-norm_r([V | Observations], C, [[NORM, C, V] | Result]) :-
-	!,
+norm_r(V, [C | CS], D, _, Result) :-
 	vsub(V, C, VSUB),
 	norm(VSUB, NORM),
-	norm_r(Observations, C, Result).
-norm_r([], _, []).
-
-partition_a([[_N, C, V] | Observations], [], [[C, V] | Result]) :-
+	NORM < D,
 	!,
-	partition_a(Observations, [V], Result).
-partition_a([[_N, _C, V] | Observations], Acc, Result) :-
-	member(V, Acc),
+	norm_r(V, CS, NORM, [C, V], Result).
+norm_r(V, [_ | CS], D, R, Result) :-
 	!,
-	partition_a(Observations, Acc, Result).
-partition_a([[_N, C, V] | Observations], Acc, [[C, V] | Result]) :-
-	\+member(V, Acc),
-	!,
-	partition_a(Observations, [V | Acc], Result).
-partition_a([], _, []).
+	norm_r(V, CS, D, R, Result).
+norm_r(_, [], _, Result, Result).
 
 partition_r([[C, V] | Observations], _, [], Result) :-
 	!,
@@ -147,12 +140,3 @@ vector([X | Vector]) :-
 	number(X),
 	vector(Vector).
 vector([]).
-
-/*
-make_obs(0, []) :- !.
-make_obs(N, [[X, Y] | Result]) :-
-	random_between(-50, 50, X),
-	random_between(-50, 50, Y),
-	M is N-1,
-	make_obs(M, Result).
-*/

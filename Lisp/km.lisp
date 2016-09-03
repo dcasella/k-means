@@ -11,6 +11,10 @@
   (cond ((< (length observations) k)
           ;; Errore: impossibile computare i clusters
           (error "Can't compute clusters."))
+        ;; Controlla se il numero di osservazioni è uguale a k
+        ((= (length observations) k)
+          ;; Ritorna observations
+          observations)
         ;; Controlla se non è possibile computare observations
         ((null observations)
           NIL)
