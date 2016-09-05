@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
@@ -7,6 +6,7 @@
 #define ERR_NO_NUM -1
 #define ERR_NO_MEM -2
 
+// Declaration
 void print_vector(double* vector, int vector_size);
 void print_observations(double** observations, int observations_size, int vector_size);
 void print_clusters(int* clusters, double** observations, int k, int observations_size, int vector_size);
@@ -25,8 +25,7 @@ double **initialize(double** observations, int k, int observations_size, int vec
 int *partition(double** observations, double** cs, int k, int observations_size, int vector_size);
 double **re_centroids(int* clisters, double** observations, int k, int observations_size, int vector_size);
 
-
-
+// Implementation
 void print_vector(double *vector, int vector_size) {
 	printf("(");
 
@@ -165,6 +164,9 @@ double norm(double *vector, int vector_size) {
 	return sqrt(innerprod(vector, vector, vector_size));
 }
 
+/* Loved this shuffling random algorithm
+ * Source: http://stackoverflow.com/a/5064432
+ */
 int rand_num(int size) {
 	int i, n;
 	static int numNums = 0;
