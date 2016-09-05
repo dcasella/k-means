@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
@@ -119,6 +120,8 @@ int *km(double **observations, int k, int observations_size, int vector_size) {
 		memcpy(clusters, new_clusters, observations_size * sizeof(int));
 		cs = re_centroids(new_clusters, observations, k, observations_size, vector_size);
 	}
+
+	return clusters; // Just for fun
 }
 
 double *centroid(double **observations, int observations_size, int vector_size) {
@@ -126,7 +129,7 @@ double *centroid(double **observations, int observations_size, int vector_size) 
 
 	for (int i = 0; i < observations_size; i++)
 		vector = vsum(vector, observations[i], vector_size);
-	
+
 	for (int i = 0; i < vector_size; i++)
 		vector[i] /= observations_size;
 
@@ -261,6 +264,6 @@ double **re_centroids(int *clusters, double **observations, int k, int observati
 	}
 
 	free(temp_arr);
-	
+
 	return centroids;
 }
