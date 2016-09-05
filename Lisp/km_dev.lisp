@@ -8,16 +8,11 @@
  Parametro k, numero di clusters da generare.
  Ritorna k clusters dell'insieme di osservazioni observations."
   ;; Controlla se il numero di osservazioni è minore di k
-  (cond ((< (length observations) k)
-         ;; Errore: impossibile computare i clusters
-         (error "Can't compute clusters."))
+  (cond ((< (length observations) k) (error "Can't compute clusters."))
         ;; Controlla se il numero di osservazioni è uguale a k
-        ((= (length observations) k)
-         ;; Ritorna observations
-         observations)
+        ((= (length observations) k) observations)
         ;; Controlla se non è possibile computare observations
-        ((null observations)
-         NIL)
+        ((null observations) NIL)
         ;; Prosegui con l'algoritmo
         (T (km-r observations NIL (initialize observations k)))))
 
@@ -61,12 +56,12 @@
  Crea k centroidi iniziali usando il metodo di Forgy.
  Metodo di Forgy: sceglie casualmente k delle osservazioni iniziali."
   ;; Caso base: la lista risultante è composta da k vettori
-  (if (= k 0) NIL
-      ;; rand = Vettore estratto da observations dato un indice casuale
-      (let ((rand (nth (random (length observations)) observations)))
-           ;; Rimuovi il vettore selezionato da observations
-           ;; per non incorrerci nuovamente nelle ricorsioni future
-           (cons rand (initialize (remove rand observations) (- k 1))))))
+  (cond ((= k 0) NIL)
+        ;; rand = Vettore estratto da observations dato un indice casuale
+        (T (let ((rand (nth (random (length observations)) observations)))
+                ;; Rimuovi il vettore selezionato da observations
+                ;; per non incorrerci nuovamente nelle ricorsioni future
+                (cons rand (initialize (remove rand observations) (- k 1)))))))
 
 (defun km-r (observations clusters cs)
  "Parametro observations, lista di vettori (ovvero liste).
@@ -80,9 +75,11 @@
   (let ((new-clusters (partition observations cs)))
        ;; Caso base: i clusters calcolati nella ricorsione attuale sono
        ;; uguali a quelli calcolati nella ricorsione precedente
-       (if (equal clusters new-clusters) clusters
-           ;; Computa ricorsivamente i clusters con nuovi centroidi
-           (km-r observations new-clusters (re-centroids new-clusters)))))
+       (cond ((equal clusters new-clusters) clusters)
+             ;; Computa ricorsivamente i clusters con nuovi centroidi
+             (T (km-r observations
+                      new-clusters
+                      (re-centroids new-clusters))))))
 
 (defun partition (observations cs)
  "Parametro observations, lista di vettori (ovvero liste).
@@ -108,12 +105,11 @@
  "Parametro observations, lista di vettori (ovvero liste).
  Parametro cs, lista di centroidi.
  Ritorna la lista di liste di tris (Distanza Centroide Vettore)."
-  ;; Caso base: non ci sono centroidi da computare
-  (if (null observations) NIL
-      ;; Calcola la lista di tris per il primo centroide e ricorsivamente
-      ;; per per ogni centroide
-      (cons (norm-r (car observations) cs most-positive-fixnum NIL)
-            (partition-n (cdr observations) cs))))
+  ;;
+  (cond ((null observations) NIL)
+        ;;
+        (T (cons (norm-r (car observations) cs most-positive-fixnum NIL)
+                 (partition-n (cdr observations) cs)))))
 
 (defun norm-r (v cs d-old result)
  "Parametro observations, lista di vettori (ovvero liste).
@@ -121,36 +117,36 @@
  Calcola la distanza tra ogni vettore di observations ed il centroide c,
  e ritorna una lista di tris (Distanza Centroide Vettore)."
   ;;
-  (if (null cs) result
-      ;;
-      (let ((d-new (norm (vsub v (car cs)))))
-           (if (< d-new d-old) (norm-r v (cdr cs)
-                                         d-new
-                                         (cons (car cs)
-                                               (cons v NIL)))
-               (norm-r v (cdr cs) d-old result)))))
+  (cond ((null cs) result)
+        ;;
+        (T (let ((d-new (norm (vsub v (car cs)))))
+                (cond ((< d-new d-old) (norm-r v
+                                               (cdr cs)
+                                               d-new
+                                               (cons (car cs)
+                                                     (cons v NIL))))
+                      (T (norm-r v (cdr cs) d-old result)))))))
 
 (defun partition-r (observations cs)
  "Parametro observations, lista di coppie (Centroide Vettore).
  Parametro cs, lista di centroidi.
  Ritorna la lista di liste di vettori raggruppati per centroide."
   ;; Caso base: non ci sono centroidi da computare
-  (if (null cs) NIL
-      ;; Calcola la lista di vettori per il primo centroide (rimuovendo gli
-      ;; eventuali duplicati) e ricorsivamente per ogni centroide
-      (cons (remove-duplicates (partition-a observations (car cs)))
-            (partition-r observations (cdr cs)))))
+  (cond ((null cs) NIL)
+        ;;
+        (T (cons (remove-duplicates (partition-a observations (car cs)))
+                 (partition-r observations (cdr cs))))))
 
 (defun partition-a (observations c)
  "Parametro observations, lista di coppie (Centroide Vettore).
  Parametro c, centroide.
  Ritorna la lista di vettori appartenenti alle coppie corrispondenti."
   ;; Caso base: non ci sono coppie da computare
-  (if (null observations) NIL
-      ;; Estrai il primo vettore avente come centroide corrispondente c
-      ;; e ricorsivamente dal cdro di observations (cdr ...)
-      (append (cdr (assoc c observations :test #'equal))
-              (partition-a (cdr observations) c))))
+  (cond ((null observations) NIL)
+        ;; Estrai il primo vettore avente come centroide corrispondente c
+        ;; e ricorsivamente dal cdr di observations (cdr ...)
+        (T (append (cdr (assoc c observations :test #'equal))
+                   (partition-a (cdr observations) c)))))
 
 (defun re-centroids (clusters)
  "Parametro clusters, lista di liste di vettori (ovvero liste).

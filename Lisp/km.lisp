@@ -8,16 +8,11 @@
  Parametro k, numero di clusters da generare.
  Ritorna k clusters dell'insieme di osservazioni observations."
   ;; Controlla se il numero di osservazioni è minore di k
-  (cond ((< (length observations) k)
-          ;; Errore: impossibile computare i clusters
-         (error "Can't compute clusters."))
+  (cond ((< (length observations) k) (error "Can't compute clusters."))
         ;; Controlla se il numero di osservazioni è uguale a k
-        ((= (length observations) k)
-          ;; Ritorna observations
-         observations)
+        ((= (length observations) k) observations)
         ;; Controlla se non è possibile computare observations
-        ((null observations)
-         NIL)
+        ((null observations) NIL)
         ;; Prosegui con l'algoritmo
         (T (km-r observations NIL (initialize observations k)))))
 
@@ -62,7 +57,7 @@
  Metodo di Forgy: sceglie casualmente k delle osservazioni iniziali."
   ;; Caso base: la lista risultante è composta da k vettori
   (cond ((= k 0) NIL)
-         ;; rand = Vettore estratto da observations dato un indice casuale
+        ;; rand = Vettore estratto da observations dato un indice casuale
         (T (let ((rand (nth (random (length observations)) observations)))
                 ;; Rimuovi il vettore selezionato da observations
                 ;; per non incorrerci nuovamente nelle ricorsioni future
@@ -108,11 +103,11 @@
  Parametro cs, lista di centroidi.
  Ritorna la lista di liste di tris (Distanza Centroide Vettore)."
   ;; Caso base: non ci sono centroidi da computare
-  (if (null cs) NIL
-      ;; Calcola la lista di tris per il primo centroide e ricorsivamente
-      ;; per per ogni centroide
-      (append (norm-r observations (car cs))
-              (partition-n observations (cdr cs)))))
+  (cond ((null cs) NIL)
+        ;; Calcola la lista di tris per il primo centroide e ricorsivamente
+        ;; per per ogni centroide
+        (T (append (norm-r observations (car cs))
+                   (partition-n observations (cdr cs))))))
 
 (defun norm-r (observations c)
  "Parametro observations, lista di vettori (ovvero liste).
@@ -153,7 +148,7 @@
   ;; Caso base: non ci sono coppie da computare
   (cond ((null observations) NIL)
         ;; Estrai il primo vettore avente come centroide corrispondente c
-        ;; e ricorsivamente dal resto di observations (cdr ...)
+        ;; e ricorsivamente dal cdr di observations (cdr ...)
         (T (append (cdr (assoc c observations :test #'equal))
                    (partition-a (cdr observations) c)))))
 

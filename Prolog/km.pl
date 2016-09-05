@@ -26,27 +26,27 @@ km(_, _, _) :-
 % Parametro Observations, lista di vettori (ovvero liste).
 % Calcola il centroide dell'insieme di osservazioni Observations.
 centroid(Observations, Centroid) :-
-  	% Somma (facendo uso di vsum) le osservazioni
+	% Somma (facendo uso di vsum) le osservazioni
 	vsum_list(Observations, VSUM),
 	length(Observations, L),
 	% Dividi ogni coordinata del vettore generato da vsum_list per il
-  	% numero di osservazioni
+	% numero di osservazioni
 	maplist(divide(L), VSUM, Centroid).
 
 vsum([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X + Y,
 	vsum(Vector1, Vector2, V).
-vsum([], [], []).	
+vsum([], [], []).
 
 vsub([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X - Y,
 	vsub(Vector1, Vector2, V).
-vsub([], [], []).	
+vsub([], [], []).
 
 innerprod(Vector1, Vector2, R) :-
 	prod(Vector1, Vector2, T),
 	sum_list(T, R).
-innerprod([], [], []).	
+innerprod([], [], []).
 
 norm(Vector, N) :-
 	innerprod(Vector, Vector, P),
