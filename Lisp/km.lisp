@@ -1,5 +1,10 @@
+;;;; -*- Mode: Lisp -*-
+
+;;;; km.lisp --
 ;;;; Casella Davide 793631
 ;;;; Nicolini Fabio 794467
+
+
 
 ;;; Funzioni principali
 
@@ -156,3 +161,5 @@
  "Parametro clusters, lista di liste di vettori (ovvero liste).
  Ricalcola il centroide di ogni gruppo."
   (mapcar #'centroid clusters))
+
+;;;; end of file -- km.lisp --
