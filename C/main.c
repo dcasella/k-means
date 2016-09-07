@@ -21,7 +21,7 @@ int main() {
 		observations[i] = malloc(sizeof(double) * vector_size);
 
 	if ((fp = fopen(filename, "r+")) == NULL) {
-		printf("File doesn't exist.\n");
+		printf("No such file or directory\n");
 		exit(1);
 	}
 
