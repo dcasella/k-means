@@ -6,7 +6,7 @@
 %! km(+Observations, +K, -Clusters)
 % Argomento Observations, lista di vettori (ovvero liste)
 % Argomento K, numero di clusters da generare
-% Clusters unifica con una lista di  K gruppi di vettori dell'insieme di 
+% Clusters unifica con una lista di  K gruppi di vettori dell'insieme di
 % osservazioni Observations
 km(Observations, K, Clusters) :-
 	% Controlla che il numero di osservazioni sia maggiore di K
@@ -16,7 +16,8 @@ km(Observations, K, Clusters) :-
 	initialize(Observations, K, CS),
 	km_r(Observations, [], CS, Clusters).
 km(Observations, K, Observations) :-
-	% Se il numero di osservazioni coincide con K, ritorna Observations
+	% Se il numero di osservazioni coincide con K,
+	% Clusters unifica con Observations
 	length(Observations, L),
 	L =:= K, !.
 km(_, _, _) :-
@@ -37,13 +38,13 @@ centroid(Observations, Centroid) :-
 %! vsum(+Vector1, +Vector2, -VSUM)
 % Argomento Vector1, vettore (lista di coordinate)
 % Argomento Vector2, vettore (lista di coordinate)
-% VSUM unifica con la somma vettoriale fra Vector1 e Vector2 
+% VSUM unifica con la somma vettoriale fra Vector1 e Vector2
 vsum([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X + Y,
 	vsum(Vector1, Vector2, V).
 vsum([], [], []).
 
-%! vsub(+Vector1, +Vector2, VSUB)
+%! vsub(+Vector1, +Vector2, -VSUB)
 % Argomento Vector1, vettore (lista di coordinate)
 % Argomento Vector2, vettore (lista di coordinate)
 % VSUM unifica con la differenza vettoriale fra Vector1 e Vector2
@@ -52,24 +53,24 @@ vsub([X | Vector1], [Y | Vector2], [Z | V]) :-
 	vsub(Vector1, Vector2, V).
 vsub([], [], []).
 
-%! innerprod(+Vector1, +Vector2, -R)
+%! innerprod(+Vector1, +Vector2, -Innerprod)
 % Argomento Vector1, vettore (lista di coordinate)
 % Argomento Vector2, vettore (lista di coordinate)
-% R unifica con il prodotto scalare fra Vector1 e Vector2
-innerprod(Vector1, Vector2, R) :-
+% Innerprod unifica con il prodotto scalare fra Vector1 e Vector2
+innerprod(Vector1, Vector2, Innerprod) :-
 	prod(Vector1, Vector2, T),
-	sum_list(T, R).
+	sum_list(T, Innerprod).
 innerprod([], [], []).
 
-%! norm(+Vector, -N)
+%! norm(+Vector, -Norm)
 % Argomento Vector, vettore (lista di coordinate)
-% N unifica con la norma di Vector
-norm(Vector, N) :-
+% Norm unifica con la norma di Vector
+norm(Vector, Norm) :-
 	innerprod(Vector, Vector, P),
-	N is sqrt(P).
+	Norm is sqrt(P).
 
 %! new_vector(+Name, +Vector)
-% Argomento Name, un atomo prolog
+% Argomento Name, atomo prolog
 % Argomento Vector, vettore (lista di coordinate)
 % Il predicato asserisce il predicato vector(Name, Vector)
 new_vector(Name, Vector) :-
@@ -90,17 +91,21 @@ initialize(Observations, K, [V | CS]) :-
 	!,
 	length(Observations, L),
 	MaxL is L-1,
+	% Randomizza un indice N tra 0 e MaxL
 	random_between(0, MaxL, N),
+	% Estrai il vettore V di indice N
 	nth0(N, Observations, V),
+	% Rimuovi il vettore dalla lista Observations
 	delete(Observations, V, New_Observations),
 	J is K-1,
 	initialize(New_Observations, J, CS).
+% Caso base: K è pari a 0
 initialize(_, 0, []).
 
 %! km_r(+Observations, +Clusters, +Cs, -Result)
 % Argomento Observations, lista di vettori (ovvero liste)
 % Argomento Clusters, lista di gruppi di vettori calcolati nella ricorsione
-% precedente (NIL durante la prima chiamata).
+% precedente ([] durante la prima chiamata).
 % Argomento CS, lista di centroidi
 % Result unifica con la lista di K gruppi di vettori (ovvero di liste),
 % raggruppati per centroidi
@@ -115,20 +120,22 @@ km_r(Observations, Clusters, CS, Result) :-
 	% Ricalcolo dei centroidi data la nuova lista New_Clusters
 	re_centroids(New_Clusters, New_CS),
 	km_r(Observations, New_Clusters, New_CS, Result).
-% Caso base: i clusters calcolati nella ricorsione attuale sono
-% uguali a quelli calcolati nella ricorsione precedente	
+% Caso base: Clusters unifica con Result perchè la condizione
+% Clusters \== New_Clusters è risultata false nella ricorsione precedente
 km_r(_, Clusters, _, Clusters).
 
-% partition(+Observations, +CS, -Clusters)
+%! partition(+Observations, +CS, -Clusters)
 % Argomento Observations, lista di vettori (ovvero liste)
 % Argomento CS, lista di centroidi
-% Clusters unifica con la lista di k gruppi di vettori, raggruppati intorno
+% Clusters unifica con la lista di K gruppi di vettori, raggruppati intorno
 % ai centroidi CS
 partition(Observations, CS, Clusters) :-
 	partition_n(Observations, CS, PN),
 	sort(PN, SPN),
 	partition_r(SPN, [], [], Clusters).
 
+%! partition_n(+Observations, +CS, -Result)
+% ...
 partition_n([V | Observations], CS, [NR | Result]) :-
 	!,
 	current_prolog_flag(max_tagged_integer, MAX),
@@ -136,6 +143,8 @@ partition_n([V | Observations], CS, [NR | Result]) :-
 	partition_n(Observations, CS, Result).
 partition_n([], _, []).
 
+%! norm_r(+Vector, +CS, -Result)
+% ...
 norm_r(V, [C | CS], D, _, Result) :-
 	vsub(V, C, VSUB),
 	norm(VSUB, NORM),
@@ -147,6 +156,8 @@ norm_r(V, [_ | CS], D, R, Result) :-
 	norm_r(V, CS, D, R, Result).
 norm_r(_, [], _, Result, Result).
 
+%! partition_n(+Observations, +Centroid, +Acc, -Result)
+% ...
 partition_r([[C, V] | Observations], _, [], Result) :-
 	!,
 	partition_r(Observations, C, [V], Result).
@@ -159,7 +170,7 @@ partition_r([[C, V] | Observations], _, ACC2, [ACC2 | Result]) :-
 partition_r([], _, ACC2, [ACC2]).
 
 %! re_centroids(+Clusters, -CS)
-% Argomento Clusters, lista di liste di vettori(ovvero liste)
+% Argomento Clusters, lista di liste di vettori (ovvero liste)
 % CS unifica con i K centroidi ricalcolati per tutte le K liste di vettori
 % presenti in Clusters
 re_centroids(Clusters, CS) :-
@@ -177,35 +188,38 @@ vsum_list([X | Xs], A, V) :-
 	vsum_list(Xs, B, V).
 vsum_list([], V, V).
 
+%! identity(+Vector, -IE)
+% Argomento Vector, vettore (lista di coordinate)
+% IE unifica con il proprio elemento identità, ovvero una lista di zeri
 identity([_ | Xs], [0 | IE]) :-
 	identity(Xs, IE).
 identity([], []).
 
-%! divide(+L, +Coordinate, -Result)
-% Argomento L, un numero
-% Argomento Coordinate, un numero
-% Result unifica con il quoziente della divisione(algebrica) fra L(dividendo) e
-% Coordinate(divisore). Predicato utilizzato in centroid/3 per il calcolo del
-% centroide attraverso il predicato maplist/3
-divide(L, Coordinate, Result) :-
-	Result is Coordinate / L.
+%! divide(+L, +Coordinate, -Quotient)
+% Argomento L, numero
+% Argomento Coordinate, numero
+% Quotient unifica con il quoziente della divisione algebrica fra L (dividendo)
+% e Coordinate (divisore). Predicato utilizzato in centroid/3 per il calcolo
+% del centroide attraverso il predicato maplist/3
+divide(L, Coordinate, Quotient) :-
+	Quotient is Coordinate / L.
 
-%! prod(+Vector1, +Vector2, -V)
-% Argomento Vector1, un vettore (lista di coordinate)
-% Argomento Vector2, un vettore (lista di coordinate)
-% V unifica con il vettore le cui componenti sono il prodotto delle componenti
-% corrispondenti dei vettori Vector1 e Vector2
-% E' un predicato di appoggio di innerprod. Infatti se si sommano le 
-% componenti di V si ottiene il prodotto scalare fra Vector1 e Vector2 
+%! prod(+Vector1, +Vector2, -Prod)
+% Argomento Vector1, vettore (lista di coordinate)
+% Argomento Vector2, vettore (lista di coordinate)
+% Prod unifica con il vettore le cui componenti sono il prodotto delle
+% componenti corrispondenti dei vettori Vector1 e Vector2
+% Predicato di appoggio di innerprod. Infatti se si sommano le
+% componenti di V si ottiene il prodotto scalare fra Vector1 e Vector2
 prod([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X * Y,
 	prod(Vector1, Vector2, V).
 prod([], [], []).
 
 %! vector(+Vector)
-% Argomento Vector, un vettore(lista di coordinate)
+% Argomento Vector, vettore (lista di coordinate)
 % Il predicato restituisce true se l'argomento Vector
-% è una lista di coordinate(numeri), falso altrimenti
+% è una lista di coordinate (numeri), false altrimenti
 vector([X | Vector]) :-
 	number(X),
 	vector(Vector).
