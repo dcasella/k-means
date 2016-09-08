@@ -1,13 +1,15 @@
 Libreria Common Lisp "k-means"
 
+Casella Davide 793631
+Nicolini Fabio 794467
 
 
 Funzione initialize
 Utilizzando il metodo di Forgy per calcolare i centroidi iniziali, c'è la possibilità di ottenere clusters relativamente eterogenei(*), questo è dovuto alla randomizzazione dell'algoritmo che non permette di ottenere risultati costanti.
 
 Funzione partition
-L'algoritmo di partenza (e di consegna, nel caso di Lisp) che calcola una lista di lunghezza observations*k, la ordina, e ricorre sulla lista stessa più e più volte per rimuovere man mano gli elementi superflui (o duplicati), risulta comunque più efficiente di un algoritmo che itera notevolmente meno volte e che non manipola una lista di dimensioni tali (observations*k), al contrario della parte Prolog che con l'implementazione di questo algoritmo ha visto un incremento del 1000% nelle prestazioni (testato con 500 punti e 100 k).
+L'algoritmo calcola per ogni Vettore la distanza con ogni Centroide, e procede con l'esecuzione con le coppie (Centroide Vettore) di distanza minore tra di loro. La lista di coppie viene ordinata per centroide così da rendere più piacevole il raggruppamento. Dalla lista risultante vengono estratti i Vettori appartenenti ad ogni gruppo (cluster per cluster).
 
 --
 
-* http://elearning.unimib.it/mod/forum/discuss.php?d=25261
+* Riferimento a http://elearning.unimib.it/mod/forum/discuss.php?d=25261

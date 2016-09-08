@@ -56,46 +56,42 @@
  Ricalcola il centroide di ogni gruppo."
   (mapcar #'centroid clusters))
 
-(defun norm-r (observations c)
+(defun norm-r (v cs old-distance result)
  "Parametro observations, lista di vettori (ovvero liste).
  Parametro c, centroide.
- Calcola la distanza tra ogni vettore di observations ed il centroide c,
- e ritorna una lista di tris (Distanza Centroide Vettore)."
-  (mapcar #'(lambda (v)
-                    (list (norm (vsub v c)) ; Sottrai i due vettori e calcola
-                          c                 ; la norma; crea una lista (tris)
-                          v))               ; di Distanza, Centroide, Vettore
-          observations))
+ Ritorna la coppia (Centroide Vettore) la cui distanza tra vettore e centroide
+ è la minore calcolata."
+  ;; Caso base: non ci sono centroidi da computare, restituisci result
+  (cond ((null cs) result)
+        ;; Calcola la distanza tra il centroide attuale e il vettore
+        (T (let* ((c (car cs)) (new-distance (norm (vsub v c))))
+                 ;; Controlla se è minore dell'ultima distanza calcolata
+                 (cond ((< new-distance old-distance)
+                        ;; Aggiorna result con la coppia (Centroide Vettore)
+                        ;; e continua con la ricorsione
+                        (norm-r v (cdr cs) new-distance (list c v)))
+                       ;; Mantieni result e continua con la ricorsione
+                       (T (norm-r v (cdr cs) old-distance result)))))))
 
 (defun partition-n (observations cs)
  "Parametro observations, lista di vettori (ovvero liste).
  Parametro cs, lista di centroidi.
- Ritorna la lista di liste di tris (Distanza Centroide Vettore)."
-  ;; Caso base: non ci sono centroidi da computare
-  (cond ((null cs) NIL)
-        ;; Calcola la lista di tris per il primo centroide e ricorsivamente
-        ;; per per ogni centroide
-        (T (append (norm-r observations (car cs))
-                   (partition-n observations (cdr cs))))))
-
-(defun remove-first (observations)
- "Parametro observations, lista di tris (Distanza Centroide Vettore).
- Rimuovi il primo elemento di ogni sotto-lista di observations."
-  ;; Caso base: non ci sono liste da computare
+ Ritorna la lista di liste di coppie (Centroide Vettore)."
+  ;; Caso base: non ci sono vettori da computare
   (cond ((null observations) NIL)
-        ;; Estrai il resto della prima sotto-lista appartenente a observations
-        ;; e ricorsivamente da ogni sotto-lista
-        (T (cons (cdr (car observations))
-                 (remove-first (cdr observations))))))
+        ;; Calcola la coppia (Centroide Vettore) per il primo vettore
+        ;; e ricorsivamente per il resto di observations
+        (T (cons (norm-r (car observations) cs most-positive-fixnum NIL)
+                 (partition-n (cdr observations) cs)))))
 
 (defun partition-a (observations c)
  "Parametro observations, lista di coppie (Centroide Vettore).
  Parametro c, centroide.
- Ritorna la lista di vettori appartenenti alle coppie corrispondenti."
+ Ritorna la lista di vettori appartenenti al centroide c."
   ;; Caso base: non ci sono coppie da computare
   (cond ((null observations) NIL)
         ;; Estrai il primo vettore avente come centroide corrispondente c
-        ;; e ricorsivamente dal cdr di observations (cdr ...)
+        ;; e ricorsivamente dal resto di observations
         (T (append (cdr (assoc c observations :test #'equal))
                    (partition-a (cdr observations) c)))))
 
@@ -110,22 +106,29 @@
         (T (cons (remove-duplicates (partition-a observations (car cs)))
                  (partition-r observations (cdr cs))))))
 
+(defun list< (a b)
+ "Parametro a, coppia (Centroide Vettore).
+ Parametro b, coppia (Centroide Vettore).
+ Ordina in base al Centroide le due coppie (ovvero liste)"
+  ;; Caso base: se a è NIL e b non lo è, ritorna True
+  (cond ((and (null a) (not (null b))) T)
+        ;; Caso base: se b è NIL, ritorna NIL
+        ((null b) NIL)
+        ;; Se le prime coordinate di a e b sono uguali, ordina ricorsivamente
+        ;; secondo il resto delle coordinate
+        ((= (caar a) (caar b)) (list< (cdr a) (cdr b)))
+        ;; Ordina a < b quando le prime coordinate a loro volta sono una
+        ;; minore dell'altra
+        (T (< (caar a) (caar b)))))
+
 (defun partition (observations cs)
  "Parametro observations, lista di vettori (ovvero liste).
  Parametro cs, lista di centroidi.
  Raggruppa le observations attorno ai k centroidi in cs."
-  ;; Calcola la lista di liste di tris (Distanza Centroide Vettore)
-  ;; Ordina il risultato di partition-n secondo la Distanza
-  ;; Rimuovi i vettori (#'third) duplicati a partire dal fondo
-  ;; Rimuovi la Distanza dai tris (diventando così coppie)
+  ;; Calcola la lista di liste di coppie (Centroide Vettore)
+  ;; Ordina il risultato di partition-n secondo il centroide
   ;; Raggruppa le coppie (Centroide Vettore) in liste di vettori (clusters)
-  (partition-r (remove-first (remove-duplicates (sort (partition-n
-                                                       observations
-                                                       cs)
-                                                 #'<
-                                                 :key #'car)
-                              :key #'third
-                              :from-end T)) cs))
+  (partition-r (sort (partition-n observations cs) #'list<) cs))
 
 (defun km-r (observations clusters cs)
  "Parametro observations, lista di vettori (ovvero liste).
