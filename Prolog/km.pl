@@ -6,8 +6,6 @@
 
 
 
-%% Predicati principali
-
 %%%%% km/3
 %% True quando Clusters unifica con una lista di K gruppi di vettori
 %% dell'insieme di osservazioni Observations
@@ -48,7 +46,7 @@ vsum([X | Vector1], [Y | Vector2], [Z | V]) :-
 vsum([], [], []).
 
 %%%% vsub/3
-%% True quando VSUM unifica con la differenza vettoriale fra Vector1 e Vector2
+%% True quando VSUB unifica con la differenza vettoriale fra Vector1 e Vector2
 %
 vsub([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X - Y,
@@ -56,14 +54,14 @@ vsub([X | Vector1], [Y | Vector2], [Z | V]) :-
 vsub([], [], []).
 
 %%%% innerprod/3
-%% True quando Innerprod unifica con il prodotto scalare fra Vector1 e Vector2
+%% True quando IP unifica con il prodotto scalare fra Vector1 e Vector2
 %
-innerprod(Vector1, Vector2, Innerprod) :-
+innerprod(Vector1, Vector2, IP) :-
 	prod(Vector1, Vector2, T),
-	sum_list(T, Innerprod).
+	sum_list(T, IP).
 innerprod([], [], []).
 
-%%% norm/2
+%%%% norm/2
 %% True quando Norm unifica con la norma di Vector
 %
 norm(Vector, Norm) :-
@@ -78,9 +76,7 @@ new_vector(Name, Vector) :-
 	vector(Vector),
 	assert(vector(Name, Vector)).
 
-%% Predicati ausiliari
-
-%%% initialize/3
+%%%% initialize/3
 %% True quando Centroids unifica con K vettori.
 %% Questi vettori sono i centroidi iniziali dell'algoritmo K-means,
 %% scelti utilizzando il metodo di Forgy;
