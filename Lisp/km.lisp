@@ -51,10 +51,22 @@
                 ;; per non incorrerci nuovamente nelle ricorsioni future
                 (cons rand (initialize (remove rand observations) (- k 1)))))))
 
-(defun re-centroids (clusters)
+(defun map-cluster (clusters observations cl index)
+  (cond ((null clusters) NIL)
+        ((not (= cl (car clusters)))
+         (map-cluster (cdr clusters) observations cl (+ index 1)))
+        (T (cons (nth index observations)
+                 (map-cluster (cdr clusters) observations cl (+ index 1))))))
+
+(defun map-clusters (clusters observations index k)
+  (cond ((= index k) NIL)
+        (T (cons (map-cluster clusters observations index 0)
+                 (map-clusters clusters observations (+ index 1) k)))))
+
+(defun re-centroids (clusters observations index k)
  "Parametro clusters, lista di liste di vettori (ovvero liste).
  Ricalcola il centroide di ogni gruppo."
-  (mapcar #'centroid clusters))
+  (mapcar #'centroid (map-clusters clusters observations index k)))
 
 (defun norm-r (v cs old-distance result)
  "Parametro observations, lista di vettori (ovvero liste).
@@ -69,68 +81,25 @@
                  (cond ((< new-distance old-distance)
                         ;; Aggiorna result con la coppia (Centroide Vettore)
                         ;; e continua con la ricorsione
-                        (norm-r v (cdr cs) new-distance (list c v)))
+                        (norm-r v (cdr cs) new-distance c))
                        ;; Mantieni result e continua con la ricorsione
                        (T (norm-r v (cdr cs) old-distance result)))))))
-
-(defun partition-n (observations cs)
- "Parametro observations, lista di vettori (ovvero liste).
- Parametro cs, lista di centroidi.
- Ritorna la lista di liste di coppie (Centroide Vettore)."
-  ;; Caso base: non ci sono vettori da computare
-  (cond ((null observations) NIL)
-        ;; Calcola la coppia (Centroide Vettore) per il primo vettore
-        ;; e ricorsivamente per il resto di observations
-        (T (cons (norm-r (car observations) cs most-positive-fixnum NIL)
-                 (partition-n (cdr observations) cs)))))
-
-(defun partition-a (observations c)
- "Parametro observations, lista di coppie (Centroide Vettore).
- Parametro c, centroide.
- Ritorna la lista di vettori appartenenti al centroide c."
-  ;; Caso base: non ci sono coppie da computare
-  (cond ((null observations) NIL)
-        ;; Estrai il primo vettore avente come centroide corrispondente c
-        ;; e ricorsivamente dal resto di observations
-        (T (append (cdr (assoc c observations :test #'equal))
-                   (partition-a (cdr observations) c)))))
-
-(defun partition-r (observations cs)
- "Parametro observations, lista di coppie (Centroide Vettore).
- Parametro cs, lista di centroidi.
- Ritorna la lista di liste di vettori raggruppati per centroide."
-  ;; Caso base: non ci sono centroidi da computare
-  (cond ((null cs) NIL)
-        ;; Calcola la lista di vettori per il primo centroide (rimuovendo gli
-        ;; eventuali duplicati) e ricorsivamente per ogni centroide
-        (T (cons (remove-duplicates (partition-a observations (car cs)))
-                 (partition-r observations (cdr cs))))))
-
-(defun list< (a b)
- "Parametro a, coppia (Centroide Vettore).
- Parametro b, coppia (Centroide Vettore).
- Ordina in base al Centroide le due coppie (ovvero liste)"
-  ;; Caso base: se a è NIL e b non lo è, ritorna True
-  (cond ((and (null a) (not (null b))) T)
-        ;; Caso base: se b è NIL, ritorna NIL
-        ((null b) NIL)
-        ;; Se le prime coordinate di a e b sono uguali, ordina ricorsivamente
-        ;; secondo il resto delle coordinate
-        ((= (caar a) (caar b)) (list< (cdr a) (cdr b)))
-        ;; Ordina a < b quando le prime coordinate a loro volta sono una
-        ;; minore dell'altra
-        (T (< (caar a) (caar b)))))
 
 (defun partition (observations cs)
  "Parametro observations, lista di vettori (ovvero liste).
  Parametro cs, lista di centroidi.
- Raggruppa le observations attorno ai k centroidi in cs."
-  ;; Calcola la lista di liste di coppie (Centroide Vettore)
-  ;; Ordina il risultato di partition-n secondo il centroide
-  ;; Raggruppa le coppie (Centroide Vettore) in liste di vettori (clusters)
-  (partition-r (sort (partition-n observations cs) #'list<) cs))
+ Ritorna la clusters map."
+  ;; Caso base: non ci sono vettori da computare
+  (cond ((null observations) NIL)
+        ;; Calcola la coppia (Centroide Vettore) per il primo vettore
+        ;; e ricorsivamente per il resto di observations
+        (T (cons (position (norm-r (car observations)
+                                   cs
+                                   most-positive-fixnum
+                                   cs) cs)
+                 (partition (cdr observations) cs)))))
 
-(defun km-r (observations clusters cs)
+(defun lloyd-km (observations clusters cs k)
  "Parametro observations, lista di vettori (ovvero liste).
  Parametro clusters, lista di gruppi di vettori calcolati nella ricorsione
  precedente (NIL durante la prima chiamata).
@@ -144,9 +113,10 @@
        ;; uguali a quelli calcolati nella ricorsione precedente
        (cond ((equal clusters new-clusters) clusters)
              ;; Computa ricorsivamente i clusters con nuovi centroidi
-             (T (km-r observations
-                      new-clusters
-                      (re-centroids new-clusters))))))
+             (T (lloyd-km observations
+                          new-clusters
+                          (re-centroids new-clusters observations 0 k)
+                          k)))))
 
 (defun km (observations k)
  "Parametro observations, lista di vettori (ovvero liste).
@@ -159,6 +129,10 @@
         ;; Controlla se non è possibile computare observations
         ((null observations) NIL)
         ;; Prosegui con l'algoritmo
-        (T (km-r observations NIL (initialize observations k)))))
+        (T (map-clusters (lloyd-km observations
+                                   NIL
+                                   (initialize observations k)
+                                   k)
+                         observations 0 k))))
 
 ;;;; end of file -- km.lisp --
