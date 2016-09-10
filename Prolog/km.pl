@@ -16,7 +16,7 @@ km(Observations, K, Clusters) :-
 	L > K,
 	!,
 	initialize(Observations, K, CS),
-	km_r(Observations, [], CS, Clusters).
+	lloyd_km(Observations, [], CS, Clusters).
 km(Observations, K, Observations) :-
 	% Se il numero di osservazioni coincide con K,
 	% Clusters unifica con Observations
@@ -98,11 +98,11 @@ initialize(Observations, K, [V | CS]) :-
 % Caso base: K è pari a 0
 initialize(_, 0, []).
 
-%%%% km_r/4
+%%%% lloyd_km/4
 %% True quando Result unifica con una lista di K gruppi di vettori
 %% raggruppati per centroide
 %
-km_r(Observations, Clusters, CS, Result) :-
+lloyd_km(Observations, Clusters, CS, Result) :-
 	% Calcola la lista di gruppi di vettori ottenuta raggruppando
 	% le Observations attorno ai centroidi CS(ovvero New_Clusters)
 	partition(Observations, CS, New_Clusters),
@@ -112,10 +112,10 @@ km_r(Observations, Clusters, CS, Result) :-
 	!,
 	% Ricalcolo dei centroidi data la nuova lista New_Clusters
 	re_centroids(New_Clusters, New_CS),
-	km_r(Observations, New_Clusters, New_CS, Result).
+	lloyd_km(Observations, New_Clusters, New_CS, Result).
 % Caso base: Clusters unifica con Result perchè la condizione
 % Clusters \== New_Clusters è risultata false nella ricorsione precedente
-km_r(_, Clusters, _, Clusters).
+lloyd_km(_, Clusters, _, Clusters).
 
 %%%% partition/3
 %% True quando Clusters unifica con la lista di K gruppi di vettori
