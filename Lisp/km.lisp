@@ -23,9 +23,10 @@
  Calcola il centroide dell'insieme di osservazioni observations."
 	;; Dividi ogni coordinata del vettore generato da reduce per il numero
 	;; di osservazioni
-	(mapcar #'(lambda (coord) (/ coord (length observations)))
-					;; Somma (facendo uso di vsum) le osservazioni
-					(reduce #'vsum observations)))
+	(cond ((null observations) NIL)
+	      (T (mapcar #'(lambda (coord) (/ coord (length observations)))
+									 ;; Somma (facendo uso di vsum) le osservazioni
+									 (reduce #'vsum observations)))))
 
 (defun innerprod (vector1 vector2)
  "Parametro vector1, vettore (lista di coordinate).
@@ -81,13 +82,13 @@
 				(T (cons (map-cluster clusters observations cl 0)
 								 (map-clusters clusters observations (+ cl 1) k)))))
 
-(defun re-centroids (clusters observations cl k)
+(defun re-centroids (clusters observations k)
  "Parametro clusters, lista di liste di vettori (ovvero liste).
  Parametro observations, lista di vettori (ovvero liste).
  Parametro cl, indice del cluster.
  Parametro k, numero di clusters da generare.
  Ricalcola il centroide di ogni cluster."
-	(mapcar #'centroid (map-clusters clusters observations cl k)))
+	(mapcar #'centroid (map-clusters clusters observations 0 k)))
 
 (defun pick-centroid (v cs old-distance result)
  "Parametro v, vettore.
@@ -97,6 +98,7 @@
  Ritorna il centroide la cui distanza tra v e centroide è la minore calcolata."
 	;; Caso base: non ci sono centroidi da computare, restituisci result
 	(cond ((null cs) result)
+	      ((null (car cs)) (pick-centroid v (cdr cs) old-distance result))
 				;; Calcola la distanza tra il centroide attuale e il vettore
 				(T (let* ((c (car cs)) (new-distance (norm (vsub v c))))
 								 ;; Controlla se è minore dell'ultima distanza calcolata
@@ -139,7 +141,7 @@
 						 ;; Computa ricorsivamente i clusters con nuovi centroidi
 						 (T (lloyd-km observations
 													new-clusters
-													(re-centroids new-clusters observations 0 k)
+													(re-centroids new-clusters observations k)
 													k)))))
 
 (defun km (observations k)
