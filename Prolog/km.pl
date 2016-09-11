@@ -132,23 +132,23 @@ partition(Observations, CS, Clusters) :-
 partition_n([V | Observations], CS, [NR | Result]) :-
 	!,
 	current_prolog_flag(max_tagged_integer, MAX),
-	norm_r(V, CS, MAX, [], NR),
+	pick_centroid(V, CS, MAX, [], NR),
 	partition_n(Observations, CS, Result).
 partition_n([], _, []).
 
-%%%% norm_r/5
+%%%% pick_centroid/5
 %% True quando Result unifica con ...
 %
-norm_r(V, [C | CS], D, _, Result) :-
+pick_centroid(V, [C | CS], D, _, Result) :-
 	vsub(V, C, VSUB),
 	norm(VSUB, NORM),
 	NORM < D,
 	!,
-	norm_r(V, CS, NORM, [C, V], Result).
-norm_r(V, [_ | CS], D, R, Result) :-
+	pick_centroid(V, CS, NORM, [C, V], Result).
+pick_centroid(V, [_ | CS], D, R, Result) :-
 	!,
-	norm_r(V, CS, D, R, Result).
-norm_r(_, [], _, Result, Result).
+	pick_centroid(V, CS, D, R, Result).
+pick_centroid(_, [], _, Result, Result).
 
 %%%% partition_n/4
 %% True quando Result unifica con ...
