@@ -16,7 +16,8 @@ km(Observations, K, Clusters) :-
 	L > K,
 	!,
 	initialize(Observations, K, CS),
-	km_r(Observations, [], CS, Clusters).
+	lloyd_km(Observations, [], CS, K, ClustersMap),
+	map_clusters(ClustersMap, Observations, 0, K, Clusters).
 km(Observations, K, Observations) :-
 	% Se il numero di osservazioni coincide con K,
 	% Clusters unifica con Observations
@@ -35,7 +36,8 @@ centroid(Observations, Centroid) :-
 	length(Observations, L),
 	% Dividi ogni coordinata del vettore generato da vsum_list per il
 	% numero di osservazioni
-	maplist(divide(L), VSUM, Centroid).
+	vdiv(VSUM, L, Centroid).
+centroid([], []).
 
 %%%%% vsum/3
 %% True quando VSUM unifica con la somma vettoriale fra Vector1 e Vector2
@@ -57,7 +59,7 @@ vsub([], [], []).
 %% True quando IP unifica con il prodotto scalare fra Vector1 e Vector2
 %
 innerprod(Vector1, Vector2, IP) :-
-	prod(Vector1, Vector2, T),
+	vprod(Vector1, Vector2, T),
 	sum_list(T, IP).
 innerprod([], [], []).
 
@@ -82,9 +84,16 @@ new_vector(Name, Vector) :-
 %% scelti utilizzando il metodo di Forgy;
 %% metodo di Forgy: sceglie casualmente k delle osservazioni iniziali
 %
-initialize(Observations, K, [V | CS]) :-
+initialize(_, 0, []) :- !.
+initialize([], K, [[] | CS]) :-
+	% Quando ci sono troppi vettori uguali in Observations
+	% questo predicato permette la continuazione dell'algoritmo
 	K > 0,
 	!,
+	J is K - 1,
+	initialize([], J, CS).
+initialize(Observations, K, [V | CS]) :-
+	K > 0,
 	length(Observations, L),
 	MaxL is L-1,
 	% Randomizza un indice N tra 0 e MaxL
@@ -93,16 +102,14 @@ initialize(Observations, K, [V | CS]) :-
 	nth0(N, Observations, V),
 	% Rimuovi il vettore dalla lista Observations
 	delete(Observations, V, New_Observations),
-	J is K-1,
+	J is K - 1,
 	initialize(New_Observations, J, CS).
-% Caso base: K è pari a 0
-initialize(_, 0, []).
 
-%%%% km_r/4
+%%%% lloyd_km/4
 %% True quando Result unifica con una lista di K gruppi di vettori
 %% raggruppati per centroide
 %
-km_r(Observations, Clusters, CS, Result) :-
+lloyd_km(Observations, Clusters, CS, K, Result) :-
 	% Calcola la lista di gruppi di vettori ottenuta raggruppando
 	% le Observations attorno ai centroidi CS(ovvero New_Clusters)
 	partition(Observations, CS, New_Clusters),
@@ -111,65 +118,47 @@ km_r(Observations, Clusters, CS, Result) :-
 	Clusters \== New_Clusters,
 	!,
 	% Ricalcolo dei centroidi data la nuova lista New_Clusters
-	re_centroids(New_Clusters, New_CS),
-	km_r(Observations, New_Clusters, New_CS, Result).
+	re_centroids(New_Clusters, Observations, K, New_CS),
+	lloyd_km(Observations, New_Clusters, New_CS, K, Result).
 % Caso base: Clusters unifica con Result perchè la condizione
 % Clusters \== New_Clusters è risultata false nella ricorsione precedente
-km_r(_, Clusters, _, Clusters).
+lloyd_km(_, Clusters, _, _, Clusters).
 
 %%%% partition/3
-%% True quando Clusters unifica con la lista di K gruppi di vettori
-%% raggruppati intorno ai centroidi CS
-%
-partition(Observations, CS, Clusters) :-
-	partition_n(Observations, CS, PN),
-	sort(PN, SPN),
-	partition_r(SPN, [], [], Clusters).
-
-%%%% partition_n/3
 %% True quando Result unifica con ...
 %
-partition_n([V | Observations], CS, [NR | Result]) :-
+partition([V | Observations], CS, [NTHC | Result]) :-
 	!,
 	current_prolog_flag(max_tagged_integer, MAX),
-	norm_r(V, CS, MAX, [], NR),
-	partition_n(Observations, CS, Result).
-partition_n([], _, []).
+	pick_centroid(V, CS, MAX, [], C),
+	nth0(NTHC, CS, C),
+	partition(Observations, CS, Result).
+partition([], _, []).
 
-%%%% norm_r/5
+%%%% pick_centroid/5
 %% True quando Result unifica con ...
 %
-norm_r(V, [C | CS], D, _, Result) :-
+pick_centroid(V, [[] | CS], D, R, Result) :-
+	!,
+	pick_centroid(V, CS, D, R, Result).
+pick_centroid(V, [C | CS], D, _, Result) :-
 	vsub(V, C, VSUB),
 	norm(VSUB, NORM),
 	NORM < D,
 	!,
-	norm_r(V, CS, NORM, [C, V], Result).
-norm_r(V, [_ | CS], D, R, Result) :-
+	pick_centroid(V, CS, NORM, C, Result).
+pick_centroid(V, [_ | CS], D, R, Result) :-
 	!,
-	norm_r(V, CS, D, R, Result).
-norm_r(_, [], _, Result, Result).
-
-%%%% partition_n/4
-%% True quando Result unifica con ...
-%
-partition_r([[C, V] | Observations], _, [], Result) :-
-	!,
-	partition_r(Observations, C, [V], Result).
-partition_r([[C, V] | Observations], C, ACC2, Result) :-
-	!,
-	partition_r(Observations, C, [V | ACC2], Result).
-partition_r([[C, V] | Observations], _, ACC2, [ACC2 | Result]) :-
-	!,
-	partition_r(Observations, C, [V], Result).
-partition_r([], _, ACC2, [ACC2]).
+	pick_centroid(V, CS, D, R, Result).
+pick_centroid(_, [], _, Result, Result).
 
 %%%% re_centroids/2
 %% True quando CS unifica con i K centroidi ricalcolati
 %% per tutte le K liste di vettori presenti in Clusters
 %
-re_centroids(Clusters, CS) :-
-	maplist(centroid, Clusters, CS).
+re_centroids(Clusters, Observations, K, CS) :-
+	map_clusters(Clusters, Observations, 0, K, ClustersMap),
+	maplist(centroid, ClustersMap, CS).
 
 %%%% vsum_list/2
 %% True quando VSUM unifica con la somma vettoriale di tutti i vettori
@@ -191,25 +180,26 @@ identity([_ | Xs], [0 | IE]) :-
 	identity(Xs, IE).
 identity([], []).
 
-%%%% divide/3
-%% True quando Quotient unifica con il quoziente della divisione algebrica
-%% fra L (dividendo) e Coordinate (divisore).
+%%%% vdiv/3
+%% True quando Result unifica con il vettore le cui componenti sono
+%% la divisione tra le componenti del vettore Vector e L
 %% Predicato utilizzato in centroid/3 per il calcolo del centroide
-%% attraverso il predicato maplist/3
 %
-divide(L, Coordinate, Quotient) :-
-	Quotient is Coordinate / L.
+vdiv([X | Vector], L, [Q | V]) :-
+	Q is X / L,
+	vdiv(Vector, L, V).
+vdiv([], _, []).
 
-%%%% prod/3
-%% True quando Prod unifica con il vettore le cui componenti sono
+%%%% vprod/3
+%% True quando Result unifica con il vettore le cui componenti sono
 %% il prodotto delle componenti corrispondenti dei vettori Vector1 e Vector2
 %% Predicato di appoggio di innerprod. Infatti se si sommano
 %% le componenti di Prod si ottiene il prodotto scalare fra Vector1 e Vector2
 %
-prod([X | Vector1], [Y | Vector2], [Z | V]) :-
+vprod([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X * Y,
-	prod(Vector1, Vector2, V).
-prod([], [], []).
+	vprod(Vector1, Vector2, V).
+vprod([], [], []).
 
 %%%% vector/1
 %% True quando l'argomento Vector è una lista di coordinate (numeri)
@@ -218,5 +208,28 @@ vector([X | Vector]) :-
 	number(X),
 	vector(Vector).
 vector([]).
+
+%%%% map_cluster/5
+%%
+%
+map_cluster([CL | ClustersMap], Observations, CL, Index, [NTHV | Result]) :-
+	nth0(Index, Observations, NTHV),
+	I1 is Index + 1,
+	!,
+	map_cluster(ClustersMap, Observations, CL, I1, Result).
+map_cluster([_ | ClustersMap], Observations, CL, Index, Result) :-
+	I1 is Index + 1,
+	!,
+	map_cluster(ClustersMap, Observations, CL, I1, Result).
+map_cluster([], _, _, _, []).
+
+%%%% map_clusters/5
+%%
+%
+map_clusters(_, _, K, K, []) :- !.
+map_clusters(ClustersMap, Observations, CL, K, [Cluster | Result]) :-
+	map_cluster(ClustersMap, Observations, CL, 0, Cluster),
+	CL1 is CL + 1,
+	map_clusters(ClustersMap, Observations, CL1, K, Result).
 
 %%%%% end of file -- km.pl --
