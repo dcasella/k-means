@@ -36,7 +36,7 @@ centroid(Observations, Centroid) :-
 	length(Observations, L),
 	% Dividi ogni coordinata del vettore generato da vsum_list per il
 	% numero di osservazioni
-	maplist(divide(L), VSUM, Centroid).
+	vdiv(VSUM, L, Centroid).
 centroid([], []).
 
 %%%%% vsum/3
@@ -59,7 +59,7 @@ vsub([], [], []).
 %% True quando IP unifica con il prodotto scalare fra Vector1 e Vector2
 %
 innerprod(Vector1, Vector2, IP) :-
-	prod(Vector1, Vector2, T),
+	vprod(Vector1, Vector2, T),
 	sum_list(T, IP).
 innerprod([], [], []).
 
@@ -157,8 +157,8 @@ pick_centroid(_, [], _, Result, Result).
 %% per tutte le K liste di vettori presenti in Clusters
 %
 re_centroids(Clusters, Observations, K, CS) :-
-	map_clusters(Clusters, Observations, 0, K, MapC),
-	maplist(centroid, MapC, CS).
+	map_clusters(Clusters, Observations, 0, K, ClustersMap),
+	maplist(centroid, ClustersMap, CS).
 
 %%%% vsum_list/2
 %% True quando VSUM unifica con la somma vettoriale di tutti i vettori
@@ -180,25 +180,26 @@ identity([_ | Xs], [0 | IE]) :-
 	identity(Xs, IE).
 identity([], []).
 
-%%%% divide/3
-%% True quando Quotient unifica con il quoziente della divisione algebrica
-%% fra L (dividendo) e Coordinate (divisore).
+%%%% vdiv/3
+%% True quando Result unifica con il vettore le cui componenti sono
+%% la divisione tra le componenti del vettore Vector e L
 %% Predicato utilizzato in centroid/3 per il calcolo del centroide
-%% attraverso il predicato maplist/3
 %
-divide(L, Coordinate, Quotient) :-
-	Quotient is Coordinate / L.
+vdiv([X | Vector], L, [Q | V]) :-
+	Q is X / L,
+	vdiv(Vector, L, V).
+vdiv([], _, []).
 
-%%%% prod/3
-%% True quando Prod unifica con il vettore le cui componenti sono
+%%%% vprod/3
+%% True quando Result unifica con il vettore le cui componenti sono
 %% il prodotto delle componenti corrispondenti dei vettori Vector1 e Vector2
 %% Predicato di appoggio di innerprod. Infatti se si sommano
 %% le componenti di Prod si ottiene il prodotto scalare fra Vector1 e Vector2
 %
-prod([X | Vector1], [Y | Vector2], [Z | V]) :-
+vprod([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X * Y,
-	prod(Vector1, Vector2, V).
-prod([], [], []).
+	vprod(Vector1, Vector2, V).
+vprod([], [], []).
 
 %%%% vector/1
 %% True quando l'argomento Vector è una lista di coordinate (numeri)
@@ -211,24 +212,24 @@ vector([]).
 %%%% map_cluster/5
 %%
 %
-map_cluster([CL | Clusters], Observations, CL, Index, [NTHV | Result]) :-
+map_cluster([CL | ClustersMap], Observations, CL, Index, [NTHV | Result]) :-
 	nth0(Index, Observations, NTHV),
 	I1 is Index + 1,
 	!,
-	map_cluster(Clusters, Observations, CL, I1, Result).
-map_cluster([_ | Clusters], Observations, CL, Index, Result) :-
+	map_cluster(ClustersMap, Observations, CL, I1, Result).
+map_cluster([_ | ClustersMap], Observations, CL, Index, Result) :-
 	I1 is Index + 1,
 	!,
-	map_cluster(Clusters, Observations, CL, I1, Result).
+	map_cluster(ClustersMap, Observations, CL, I1, Result).
 map_cluster([], _, _, _, []).
 
 %%%% map_clusters/5
 %%
 %
 map_clusters(_, _, K, K, []) :- !.
-map_clusters(Clusters, Observations, CL, K, [Cluster | Result]) :-
-	map_cluster(Clusters, Observations, CL, 0, Cluster),
+map_clusters(ClustersMap, Observations, CL, K, [Cluster | Result]) :-
+	map_cluster(ClustersMap, Observations, CL, 0, Cluster),
 	CL1 is CL + 1,
-	map_clusters(Clusters, Observations, CL1, K, Result).
+	map_clusters(ClustersMap, Observations, CL1, K, Result).
 
 %%%%% end of file -- km.pl --
