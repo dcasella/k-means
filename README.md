@@ -167,3 +167,4 @@ __new_vector__(_Name_, _Vector_)
 
 Il predicato __new_vector/2__ è vero quando a _Name_ (un atomo `Prolog`) viene associato un vettore _Vector_.  
 In questo caso potete usare __assert__.
+
