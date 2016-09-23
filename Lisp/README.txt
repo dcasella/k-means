@@ -19,11 +19,11 @@ Il parametro index è necessario poichè l'indice corrente dell'elemento viene p
 
 Funzione map-clusters
 (map-clusters <clusters-map> <observations> <cluster-index> <k>)
-Genera k clusters, eseguendo la funzione map-cluster per ogni indice di Cluster (cluster-index, o cl nel codice) fino ad un massimo di K, ovvero il numero di Clusters.
+Genera K Clusters, eseguendo la funzione map-cluster per ogni indice di Cluster (cluster-index, o cl nel codice) fino ad un massimo di K, ovvero il numero di Clusters.
 
 Avendo optato per l'utilizzo di una Clusters-Map, sono state apportate le dovute modifiche alle seguenti funzioni:
-re-centroids, all'interno della chiamata a mapcar è necessario l'uso di map-clusters
-km, il risultato viene restituito dopo l'uso di map-clusters
+re-centroids, all'interno della funzione mapcar è necessario l'uso di map-clusters;
+km, il risultato viene restituito dopo l'uso di map-clusters.
 
 --
 
