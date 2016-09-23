@@ -125,7 +125,8 @@ lloyd_km(Observations, Clusters, CS, K, Result) :-
 lloyd_km(_, Clusters, _, _, Clusters).
 
 %%%% partition/3
-%% True quando Result unifica con ...
+%% True quando Result unifica con la ClustersMap che rappresenta la lista di
+%% indici dei Clusters ai quali corrisponde ogni elemento di Observations
 %
 partition([V | Observations], CS, [NTHC | Result]) :-
 	!,
@@ -136,7 +137,8 @@ partition([V | Observations], CS, [NTHC | Result]) :-
 partition([], _, []).
 
 %%%% pick_centroid/5
-%% True quando Result unifica con ...
+%% True quando Result unifica con il centroide la cui distanza tra quest'ultimo
+%% e il vettore è la minore calcolata
 %
 pick_centroid(V, [[] | CS], D, R, Result) :-
 	!,
@@ -153,12 +155,13 @@ pick_centroid(V, [_ | CS], D, R, Result) :-
 pick_centroid(_, [], _, Result, Result).
 
 %%%% re_centroids/2
-%% True quando CS unifica con i K centroidi ricalcolati
-%% per tutte le K liste di vettori presenti in Clusters
+%% True quando CS unifica con i K centroidi ricalcolati per tutte le K liste
+%% di vettori presenti nella lista Clusters, risultante dalla chiamata al
+%% predicato map_clusters (con input la lista ClustersMap)
 %
-re_centroids(Clusters, Observations, K, CS) :-
-	map_clusters(Clusters, Observations, 0, K, ClustersMap),
-	maplist(centroid, ClustersMap, CS).
+re_centroids(ClustersMap, Observations, K, CS) :-
+	map_clusters(ClustersMap, Observations, 0, K, Clusters),
+	maplist(centroid, Clusters, CS).
 
 %%%% vsum_list/2
 %% True quando VSUM unifica con la somma vettoriale di tutti i vettori
@@ -210,7 +213,9 @@ vector([X | Vector]) :-
 vector([]).
 
 %%%% map_cluster/5
-%%
+%% True quando Result unifica con il Cluster di vettori (lista di liste) di
+%% indice CL, data la ClustersMap (lista di indici di Clusters) e la lista
+%% dei vettori di partenza, Observations
 %
 map_cluster([CL | ClustersMap], Observations, CL, Index, [NTHV | Result]) :-
 	nth0(Index, Observations, NTHV),
@@ -224,7 +229,9 @@ map_cluster([_ | ClustersMap], Observations, CL, Index, Result) :-
 map_cluster([], _, _, _, []).
 
 %%%% map_clusters/5
-%%
+%% True quando Result unifica con la lista di K Clusters, data
+%% la ClustersMap (lista di indici di Clusters) e la lista
+%% dei vettori di partenza, Observations
 %
 map_clusters(_, _, K, K, []) :- !.
 map_clusters(ClustersMap, Observations, CL, K, [Cluster | Result]) :-
