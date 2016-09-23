@@ -52,25 +52,25 @@ Metodo di Forgy: sceglie casualmente k delle osservazioni iniziali."
                 ;; per non incorrerci nuovamente nelle ricorsioni future
                 (cons rand (initialize (remove rand observations) (- k 1)))))))
 
-(defun map-cluster (clusters observations cl index)
-"Parametro clusters, lista di indici.
+(defun map-cluster (clusters-map observations cl index)
+"Parametro clusters-map, lista di indici.
 Parametro observations, lista di vettori (ovvero liste).
 Parametro cl, indice del cluster.
-Parametro index, indice di (car clusters) rispetto a clusters.
+Parametro index, indice di (car clusters-map) rispetto a clusters.
 Ritorna la lista di vettori rappresentante il cluster di indice cl."
   ;; Caso base: non ci sono indici da computare
-  (cond ((null clusters) NIL)
+  (cond ((null clusters-map) NIL)
         ;; Controlla se cl è uguale all'indice dell'elemento nella Clusters-Map
-        ((not (= cl (car clusters)))
+        ((not (= cl (car clusters-map)))
          ;; Continua la ricorsione
-         (map-cluster (cdr clusters) observations cl (+ index 1)))
+         (map-cluster (cdr clusters-map) observations cl (+ index 1)))
         ;; Ricava il vettore di indice index (indice del cluster uguale a cl)
         ;; da observations e ricorsivamente per il resto di clusters
         (T (cons (nth index observations)
-                 (map-cluster (cdr clusters) observations cl (+ index 1))))))
+                 (map-cluster (cdr clusters-map) observations cl (+ index 1))))))
 
-(defun map-clusters (clusters observations cl k)
-"Parametro clusters, lista di indici.
+(defun map-clusters (clusters-map observations cl k)
+"Parametro clusters-map, lista di indici.
 Parametro observations, lista di vettori (ovvero liste).
 Parametro cl, indice di (car clusters) rispetto a clusters.
 Parametro k, numero di clusters da generare.
@@ -79,16 +79,16 @@ Ritorna la lista di clusters partendo da una lista di indici di clusters."
   (cond ((= cl k) NIL)
         ;; Ricava il cluster (di indice cl) di vettori e ricorsivamente per il
         ;; resto dei clusters (di indici maggiori di cl)
-        (T (cons (map-cluster clusters observations cl 0)
-                 (map-clusters clusters observations (+ cl 1) k)))))
+        (T (cons (map-cluster clusters-map observations cl 0)
+                 (map-clusters clusters-map observations (+ cl 1) k)))))
 
-(defun re-centroids (clusters observations k)
-"Parametro clusters, lista di liste di vettori (ovvero liste).
+(defun re-centroids (clusters-map observations k)
+"Parametro clusters, lista di indici.
 Parametro observations, lista di vettori (ovvero liste).
 Parametro cl, indice del cluster.
 Parametro k, numero di clusters da generare.
 Ricalcola il centroide di ogni cluster."
-  (mapcar #'centroid (map-clusters clusters observations 0 k)))
+  (mapcar #'centroid (map-clusters clusters-map observations 0 k)))
 
 (defun pick-centroid (v cs old-distance result)
 "Parametro v, vettore.
