@@ -168,3 +168,42 @@ __new_vector__(_Name_, _Vector_)
 Il predicato __new_vector/2__ è vero quando a _Name_ (un atomo `Prolog`) viene associato un vettore _Vector_.  
 In questo caso potete usare __assert__.
 
+### Note ed esempi
+Considerate l’insieme di osservazioni (in 2D):
+```
+O = {(3.0, 7.0), (0.5, 1.0), (0.8, 0.5), (1.0, 8.0),
+     (0.9, 1.2), (6.0, 4.0), (7.0, 5.5),
+     (4.0, 9.0), (9.0, 4.0)}.
+```
+Le tre clusters (con k = 3) calcolate dall’algoritmo k -medie sono:
+    1. {(1.0, 8.0), (3.0, 7.0), (4.0, 9.0)},
+    2. {(0.5, 1.0), (0.8, 0.5), (0.9, 1.2)},
+    3. {(6.0, 4.0), (7.0, 5.5), (9.0, 4.0)}.
+
+#### Esempi
+##### Common Lisp
+L’ordine in ognuno dei gruppi trovati non è importante.
+```lisp
+CL prompt> (defparameter observations
+                         ’((3.0 7.0) (0.5 1.0) (0.8 0.5)
+                           (1.0 8.0) (0.9 1.2) (6.0 4.0)
+                           (7.0 5.5) (4.0 9.0) (9.0 4.0)))
+
+CL prompt> (km observations 3)
+(((1.0 8.0) (3.0 7.0) (4.0 9.0))
+ ((0.5 1.0) (0.8 0.5) (0.9 1.2))
+ ((6.0 4.0) (7.0 5.5) (9.0 4.0)))
+```
+
+##### Prolog
+L’ordine in ognuno dei gruppi trovati non è importante.
+```prolog
+?- km([[3.0, 7.0], [0.5, 1.0], [0.8, 0.5],
+       [1.0, 8.0], [0.9, 1.2], [6.0, 4.0],
+       [7.0, 5.5], [4.0, 9.0], [9.0, 4.0]],
+      3,
+      Clusters).
+Clusters = [[[1.0, 8.0], [3.0, 7.0], [4.0, 9.0]],
+            [[0.5, 1.0], [0.8, 0.5], [0.9, 1.2]]
+            [[6.0, 4.0], [7.0, 5.5], [9.0, 4.0]]].
+```
