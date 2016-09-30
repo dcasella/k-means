@@ -33,9 +33,9 @@ int main() {
 	print_observations(observations, observations_size, vector_size);
 	printf("\n\n");
 
-	int * clusters = km(observations, k, observations_size, vector_size);
+	double *** clusters = km(observations, k, observations_size, vector_size);
 	printf("Clusters:\n");
-	print_clusters(clusters, observations, k, observations_size, vector_size);
+	print_clusters(clusters, k, observations_size, vector_size);
 	printf("\n");
 
 	getchar(); // Keep the terminal open (if Windows cmd)

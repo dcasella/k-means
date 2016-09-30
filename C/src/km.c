@@ -10,10 +10,10 @@
 // Declaration
 void print_vector(double * vector, int vector_size);
 void print_observations(double ** observations, int observations_size, int vector_size);
-void print_clusters(int * clusters_map, double ** observations, int k, int observations_size, int vector_size);
+void print_clusters(double *** clusters, int k, int observations_size, int vector_size);
 int compare_clusters(int * cluster_map1, int * cluster_map2, int clusters_size);
 
-int * km(double ** observations, int k, int observations_size, int vector_size);
+double *** km(double ** observations, int k, int observations_size, int vector_size);
 double * centroid(double ** observations, int observations_size, int vector_size);
 double * vsum(double * vector1, double * vector2, int vector_size);
 double * vsub(double * vector1, double * vector2, int vector_size);
@@ -25,6 +25,10 @@ int rand_num(int size);
 double ** initialize(double ** observations, int k, int observations_size, int vector_size);
 int * partition(double ** observations, double ** cs, int k, int observations_size, int vector_size);
 double ** re_centroids(int * clusters_map, double ** observations, int k, int observations_size, int vector_size);
+double *** map_clusters(int * clusters_map, double ** observations, int k, int observations_size, int vector_size);
+double ** map_cluster(int * clusters_map, double ** observations, int cluster, int observations_size, int vector_size);
+
+int * clusters_sizes;
 
 // Implementation
 void print_vector(double * vector, int vector_size) {
@@ -34,6 +38,7 @@ void print_vector(double * vector, int vector_size) {
 		if (i > 0)
 			printf(", ");
 
+		//printf("%.2f", vector[i]);  // to print only 2 decimal values
 		printf("%f", vector[i]);
 	}
 
@@ -53,31 +58,15 @@ void print_observations(double ** observations, int observations_size, int vecto
 	printf("]");
 }
 
-void print_clusters(int * clusters_map, double ** observations, int k, int observations_size, int vector_size) {
-	double ** temp_arr = (double **) malloc(sizeof(double *) * observations_size);
-	for (int i = 0; i < observations_size; i++)
-		temp_arr[i] = (double *) malloc(sizeof(double) * vector_size);
-
+void print_clusters(double *** clusters, int k, int observations_size, int vector_size) {
 	printf("{");
 
-	for (int c = 0, count = 0; c < k; c++) {
-		for (int i = 0; i < observations_size; i++) {
-			int curr = clusters_map[i];
-
-			if (curr == c) {
-				temp_arr[count] = observations[i];
-				count++;
-			}
-		}
-
-		if (c > 0)
+	for (int i = 0; i < k; i++) {
+		if (i > 0)
 			printf(", ");
 
-		print_observations(temp_arr, count, vector_size);
-		count = 0;
+		print_observations(clusters[i], clusters_sizes[i], vector_size);
 	}
-
-	free(temp_arr);
 
 	printf("}");
 }
@@ -91,9 +80,10 @@ int compare_clusters(int * clusters_map1, int * clusters_map2, int clusters_size
 	return 1;
 }
 
-int * km(double ** observations, int k, int observations_size, int vector_size) {
-	int * clusters_map = (int *) malloc(observations_size * sizeof(int));
-	int * new_clusters_map = (int *) malloc(observations_size * sizeof(int));
+double *** km(double ** observations, int k, int observations_size, int vector_size) {
+	clusters_sizes = (int *) malloc(sizeof(int) * k);
+	int * clusters_map = (int *) malloc(sizeof(int) * observations_size);
+	int * new_clusters_map = (int *) malloc(sizeof(int) * observations_size);
 	double ** cs = (double **) malloc(sizeof(double *) * k);
 	for (int i = 0; i < k; i++)
 		cs[i] = (double *) malloc(sizeof(double) * vector_size);
@@ -112,14 +102,12 @@ int * km(double ** observations, int k, int observations_size, int vector_size) 
 			free(new_clusters_map);
 			free(cs);
 
-			return clusters_map;
+			return map_clusters(clusters_map, observations, k, observations_size, vector_size);
 		}
 
-		memcpy(clusters_map, new_clusters_map, observations_size * sizeof(int));
+		memcpy(clusters_map, new_clusters_map, sizeof(int) * observations_size);
 		cs = re_centroids(new_clusters_map, observations, k, observations_size, vector_size);
 	}
-
-	return clusters_map;
 }
 
 double * centroid(double ** observations, int observations_size, int vector_size) {
@@ -135,7 +123,7 @@ double * centroid(double ** observations, int observations_size, int vector_size
 }
 
 double * vsum(double * vector1, double * vector2, int vector_size) {
-	double * vector = (double *) malloc(vector_size * sizeof(double));
+	double * vector = (double *) malloc(sizeof(double) * vector_size);
 
 	for (int i = 0; i < vector_size; i++)
 		vector[i] = vector1[i] + vector2[i];
@@ -144,7 +132,7 @@ double * vsum(double * vector1, double * vector2, int vector_size) {
 }
 
 double * vsub(double * vector1, double * vector2, int vector_size) {
-	double * vector = (double *) malloc(vector_size * sizeof(double));
+	double * vector = (double *) malloc(sizeof(double) * vector_size);
 
 	for (int i = 0; i < vector_size; i++)
 		vector[i] = vector1[i] - vector2[i];
@@ -218,7 +206,7 @@ double ** initialize(double ** observations, int k, int observations_size, int v
 }
 
 int * partition(double ** observations, double ** cs, int k, int observations_size, int vector_size) {
-	int * clusters_map = (int *) malloc(observations_size * sizeof(int));
+	int * clusters_map = (int *) malloc(sizeof(int) * observations_size);
 	float curr_distance;
 	int centroid;
 
@@ -264,4 +252,37 @@ double ** re_centroids(int * clusters_map, double ** observations, int k, int ob
 	free(temp_arr);
 
 	return centroids;
+}
+
+double *** map_clusters(int * clusters_map, double ** observations, int k, int observations_size, int vector_size) {
+	double *** clusters = (double ***) malloc(sizeof(double **) * k);
+
+	for (int i = 0; i < k; i++)
+		clusters[i] = map_cluster(clusters_map, observations, i, observations_size, vector_size);
+
+	return clusters;
+}
+
+double ** map_cluster(int * clusters_map, double ** observations, int cluster, int observations_size, int vector_size) {
+	int count = 0;
+	int * temp_arr = (int *) malloc(sizeof(int *) * observations_size);
+
+	for (int i = 0; i < observations_size; i++) {
+		if (clusters_map[i] == cluster) {
+			temp_arr[count] = i;
+			count++;
+		}
+	}
+
+	double ** clusters = (double **) malloc(sizeof(double *) * count);
+	for (int i = 0; i < observations_size; i++)
+		clusters[i] = (double *) malloc(sizeof(double) * vector_size);
+
+	for (int i = 0; i < count; i++)
+		clusters[i] = observations[temp_arr[i]];
+
+	free(temp_arr);
+	clusters_sizes[cluster] = count;
+
+	return clusters;
 }
