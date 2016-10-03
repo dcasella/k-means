@@ -1,15 +1,14 @@
 # K-Means
 
-Uno degli algoritmi principali (e più semplici) utilizzati nell'_analisi statistica dei dati_ è noto come l’algoritmo di _clustering_ non _supervisionato_ (“unsupervised”) delle __k-medie__.  
-L’obiettivo di un algoritmo di clustering è, dato un insieme di _n oggetti_ (o _osservazioni_), partizionarli in _k_ sottoinsiemi (o categorie non predefinite) che raggruppino oggetti che condividono delle proprietà.  
-Ad esempio un algoritmo di clustering applicato a delle immagini telerilevate potrebbe partizionare le immagini sulla base della tipologia di scena rappresentata, quale centri abitati, boschi, superfici acquee, ecc. In particolare, l’algoritmo di clustering delle __k-medie__ è di partizionare n _osservazioni_ in _k clusters_ (gruppi), dove ogni osservazione appartiene al gruppo in cui cade la _media_ più “vicina”. La “media” (detta _centroide_) serve come “prototipo” del gruppo. Il centroide che rappresenta una categoria viene in questo caso calcolato come la media degli oggetti del gruppo e ne costituisce il prototipo.  
-In generale il problema è NP-hard, ma la variante “euristica” di Lloyd dell’algoritmo __k-medie__ è una soluzione abbastanza buona ed efficace. Una limitazione dell’algoritmo __k-medie__ è che il parametro _k_ deve
-essere specificato dall’utente in anticipo.
+One of the main (and simplier) algorithms used in data statistics analysis is known as the k-means unsupervised clustering algorithm.  
+The objective to a clustering algorithm is, given a group of n objects (or observations), partition them into k subsets (or categories) which assemble the objects sharing some properties.  
+Particularly, the clustering algorithm k-means partitions n observations into k clusters (groups), where every observation belongs to the group where the centroid is the nearest.  
+The Project consists in Common Lisp, Prolog and C libraries implementing Lloyd's k-means algorithm.
 
 
 ___
 
-__Algoritmo 1 k-medie__ di Lloyd: pseudo codice.  
+Lloyd's __k-means algorithm__: pseudo-code
 ```js
 KM(n observations, k) → k clusters
 1: cs ← Initialize(k)
@@ -38,77 +37,43 @@ ___
 
 __km__ _observations k_ → _clusters_  
 
-Il parametro _observations_ è una lista di vettori (ovvero liste), il parametro _k_ è il numero di clusters da generare. Il risultato _clusters_ è una lista di gruppi, ovvero di liste di vettori (che, ripetiamo, sono liste).
-La funzione deve fallire se il numero di osservazioni è minore di _k_.
-___
 
 __centroid__ _observations_ → _centroid_  
 
-La funzione __centroid__ ritorna il centroide (i.e., la “media”) dell’insieme di osservazioni _observations_ (una lista di vettori, ovvero di altre liste).  
-Nota bene. Il centroide di un insieme di vettori non è necessariamente un elemento dell’insieme dato.
-___
 
 __vsum__ _vector1 vector2_ → _v_  
 
-La funzione __vsum__ calcola la somma (vettoriale) di due vettori.
-___
 
 __vsub__ _vector1 vector2_ → _v_  
 
-La funzione __vsub__ calcola la differenza (vettoriale) di due vettori.
-___
 
 __innerprod__ _vector1 vector2_ → _v_  
 
-La funzione __innerprod__ calcola il prodotto interno (vettoriale) di due vettori. Il valore ritornato v è uno scalare.
-___
 
 __norm__ _vector_ → _v_  
-
-La funzione __norm__ calcola la norma euclidea di un vettore. Il valore ritornato _v_ è uno scalare.
-___
 
 
 ### Prolog
 
-__km__(_Observations_, _K_, _Clusters_)  
+__km__(_+Observations_, _+K_, _-Clusters_)  
 
-Il parametro _Observations_ è una lista di vettori (ovvero liste), il parametro _K_ è il numero di clusters da generare. Il predicato __km/3__ è vero quando _Clusters_ è una lista di gruppi che corrisponde alla partizione
-di _Observations_ in _k_ clusters.  
-Il predicato __km/3__ deve fallire se il numero di osservazioni è minore di _K_.
-___
 
-__centroid__(_Observations_, _Centroid_)  
+__centroid__(_+Observations_, _-Centroid_)  
 
-Il predicato __centroid/2__ è vero quando _Centroid_ è il centroide (i.e., la “media”) dell’insieme di osservazioni _Observations_ (una lista di vettori, ovvero di altre liste).  
-Nota bene. Il centroide di un insieme di vettori non è necessariamente un elemento dell’insieme dato.
-___
 
-__vsum__(_Vector1_, _Vector2_, _V_)  
+__vsum__(_+Vector1_, _+Vector2_, _-V_)  
 
-Il predicato __vsum/3__ è vero quando _V_ è la somma (vettoriale) di due vettori.
-___
 
-__vsub__(_Vector1_, _Vector2_, _V_)  
+__vsub__(_+Vector1_, _+Vector2_, _-V_)  
 
-Il predicato __vsub/3__ è vero quando _V_ è la sottrazione (vettoriale) del vettore _Vector2_ da _Vector1_.
-___
 
-__innerprod__(_Vector1_, _Vector2_, _R_)  
+__innerprod__(_+Vector1_, _+Vector2_, _-R_)  
 
-Il predicato __innerprod/3__ è vero quando _R_ è il prodotto interno (vettoriale) di due vettori. Il valore _R_ è uno scalare.
-___
 
-__norm__(Vector, _N_)  
+__norm__(+_Vector_, _-N_)  
 
-Il predicato __norm/2__ è vero quando _N_ è la norma euclidea di un vettore. Il valore ritornato _N_ è uno scalare.
-___
 
-__new_vector__(_Name_, _Vector_)  
-
-Il predicato __new_vector/2__ è vero quando a _Name_ (un atomo `Prolog`) viene associato un vettore _Vector_.  
-In questo caso potete usare __assert__.
-___
+__new_vector__(_+Name_, _+Vector_)  
 
 
 ## Examples
