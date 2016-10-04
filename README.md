@@ -6,8 +6,6 @@ Particularly, the clustering algorithm k-means partitions n observations into k 
 The Project consists in Common Lisp, Prolog and C libraries implementing Lloyd's k-means algorithm.
 
 
-___
-
 Lloyd's __k-means algorithm__: pseudo-code
 ```js
 KM(n observations, k) → k clusters
@@ -22,7 +20,6 @@ KM(n observations, k) → k clusters
 9:     goto 3
 10: end if
 ```
-___
 
 
 ## List of contents
@@ -35,22 +32,22 @@ ___
 
 ### Common Lisp
 
-__km__ _observations k_ → _clusters_  
+(__km__ _observations k_) → _clusters_  
 
 
-__centroid__ _observations_ → _centroid_  
+(__centroid__ _observations_) → _centroid_  
 
 
-__vsum__ _vector1 vector2_ → _v_  
+(__vsum__ _vector1 vector2_) → _v_  
 
 
-__vsub__ _vector1 vector2_ → _v_  
+(__vsub__ _vector1 vector2_) → _v_  
 
 
-__innerprod__ _vector1 vector2_ → _v_  
+(__innerprod__ _vector1 vector2_) → _v_  
 
 
-__norm__ _vector_ → _v_  
+(__norm__ _vector_) → _v_  
 
 
 ### Prolog
@@ -74,6 +71,27 @@ __norm__(+_Vector_, _-N_)
 
 
 __new_vector__(_+Name_, _+Vector_)  
+
+
+### C
+
+__km__(_double ** observations_, _int k_, _int observations size_, _int vector size_) → _double *** clusters_  
+
+__centroid__(_double ** observations_, _int observations size_, _int vector size_) → _double * centroid_  
+
+__vsum__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vsum_  
+
+__vsub__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vsub_  
+
+__innerprod__(_double * vector1_, _double * vector2_, _int vector size_) → _double innerprod_  
+
+__norm__(_double * vector_, _int vector size_) → _double norm_  
+
+__print_vector__(_double * vector_, _int vector size_) → _void_   
+
+__print_observations__(_double ** observations_, _int observations size_, _int vector size_) → _void_  
+
+__print_clusters__(_double *** clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
 
 
 ## Examples
@@ -150,4 +168,28 @@ S = [11, 2, 45].
 Clusters = [[[1.0, 8.0], [3.0, 7.0], [4.0, 9.0]],
             [[0.5, 1.0], [0.8, 0.5], [0.9, 1.2]]
             [[6.0, 4.0], [7.0, 5.5], [9.0, 4.0]]].
+```
+
+
+### C
+
+```c
+int observations_size = 9;
+int vector_size = 2;
+int k = 3;
+
+print_observations(observations, observations_size, vector_size);
+
+double *** clusters = km(observations, k, observations_size, vector_size);
+print_clusters(clusters, k, observations_size, vector_size);
+
+/* Output:
+ * [(3.000000, 7.000000), (0.500000, 1.000000), (0.800000, 0.500000),
+ *  (1.000000, 8.000000), (0.900000, 1.200000), (6.000000, 4.000000),
+ *  (7.000000, 5.500000), (4.000000, 9.000000), (9.000000, 4.000000)]
+ *
+ * {[(0.500000, 1.000000), (0.800000, 0.500000), (0.900000, 1.200000)],
+ *  [(6.000000, 4.000000), (7.000000, 5.500000), (9.000000, 4.000000)],
+ *  [(3.000000, 7.000000), (1.000000, 8.000000), (4.000000, 9.000000)]}
+ */
 ```
