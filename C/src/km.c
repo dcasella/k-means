@@ -1,3 +1,4 @@
+#include "../include/km.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -6,27 +7,6 @@
 #include <time.h>
 #define ERR_NO_NUM -1
 #define ERR_NO_MEM -2
-
-// Declaration
-void print_vector(double *vector, int vector_size);
-void print_observations(double **observations, int observations_size, int vector_size);
-void print_clusters(double ***clusters, int k, int observations_size, int vector_size);
-int compare_clusters(int *cluster_map1, int *cluster_map2, int clusters_size);
-
-double ***km(double **observations, int k, int observations_size, int vector_size);
-double *centroid(double **observations, int observations_size, int vector_size);
-double *vsum(double *vector1, double *vector2, int vector_size);
-double *vsub(double *vector1, double *vector2, int vector_size);
-double innerprod(double *vector1, double *vector2, int vector_size);
-double norm(double *vector, int vector_size);
-
-int rand_num(int size);
-
-double **initialize(double **observations, int k, int observations_size, int vector_size);
-int *partition(double **observations, double **cs, int k, int observations_size, int vector_size);
-double **re_centroids(int *clusters_map, double **observations, int k, int observations_size, int vector_size);
-double ***map_clusters(int *clusters_map, double **observations, int k, int observations_size, int vector_size);
-double **map_cluster(int *clusters_map, double **observations, int cluster, int observations_size, int vector_size);
 
 int *clusters_sizes;
 
@@ -92,6 +72,10 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 
 	if (observations_size < k) {
 		printf("Can't compute clusters.");
+		free(clusters_sizes);
+		free(clusters_map);
+		free(new_clusters_map);
+		free(cs);
 		exit(1);
 	}
 
@@ -106,7 +90,7 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 		}
 
 		memcpy(clusters_map, new_clusters_map, sizeof(int) * observations_size);
-		cs = re_centroids(new_clusters_map, observations, k, observations_size, vector_size);
+		cs = re_centroids(clusters_map, observations, k, observations_size, vector_size);
 	}
 }
 
@@ -153,8 +137,8 @@ double norm(double *vector, int vector_size) {
 	return sqrt(innerprod(vector, vector, vector_size));
 }
 
-/*Loved this shuffling random algorithm
- *Source: http://stackoverflow.com/a/5064432
+/* Loved this shuffling random algorithm
+ * Source: http://stackoverflow.com/a/5064432
  */
 int rand_num(int size) {
 	int i, n;
@@ -263,26 +247,26 @@ double ***map_clusters(int *clusters_map, double **observations, int k, int obse
 	return clusters;
 }
 
-double **map_cluster(int *clusters_map, double **observations, int cluster, int observations_size, int vector_size) {
+double **map_cluster(int *clusters_map, double **observations, int c, int observations_size, int vector_size) {
 	int count = 0;
 	int *temp_arr = (int *) malloc(sizeof(int *) * observations_size);
 
 	for (int i = 0; i < observations_size; i++) {
-		if (clusters_map[i] == cluster) {
+		if (clusters_map[i] == c) {
 			temp_arr[count] = i;
 			count++;
 		}
 	}
 
-	double **clusters = (double **) malloc(sizeof(double *) * count);
+	double **cluster = (double **) malloc(sizeof(double *) * count);
 	for (int i = 0; i < observations_size; i++)
-		clusters[i] = (double *) malloc(sizeof(double) * vector_size);
+		cluster[i] = (double *) malloc(sizeof(double) * vector_size);
 
 	for (int i = 0; i < count; i++)
-		clusters[i] = observations[temp_arr[i]];
+		cluster[i] = observations[temp_arr[i]];
 
 	free(temp_arr);
-	clusters_sizes[cluster] = count;
+	clusters_sizes[c] = count;
 
-	return clusters;
+	return cluster;
 }
