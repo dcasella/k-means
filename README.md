@@ -7,18 +7,18 @@ The Project consists in Common Lisp, Prolog and C libraries implementing Lloyd's
 
 
 Lloyd's __k-means algorithm__: pseudo-code
-```js
-KM(n observations, k) → k clusters
-1: cs ← Initialize(k)
-2: clusters ← {}
-3: clusters0 ← Partition(observations, cs)
-4: if clusters = clusters0 then
-5:     return clusters
-6: else
-7:     clusters ← clusters0
-8:     cs ← RecomputeCentroids(clusters)
-9:     goto 3
-10: end if
+```ruby
+1: KM(n observations, k) → k clusters
+2:     cs ← Initialize(k)
+3:     clusters ← {}
+4:     clusters0 ← Partition(observations, cs)
+5:     if clusters = clusters0 then
+6:         return clusters
+7:     else
+8:         clusters ← clusters0
+9:         cs ← RecomputeCentroids(clusters)
+10:        goto 3
+11:    end if
 ```
 
 
@@ -29,49 +29,6 @@ KM(n observations, k) → k clusters
 
 
 ## Interface
-
-### Common Lisp
-
-(__km__ _observations k_) → _clusters_  
-
-
-(__centroid__ _observations_) → _centroid_  
-
-
-(__vsum__ _vector1 vector2_) → _v_  
-
-
-(__vsub__ _vector1 vector2_) → _v_  
-
-
-(__innerprod__ _vector1 vector2_) → _v_  
-
-
-(__norm__ _vector_) → _v_  
-
-
-### Prolog
-
-__km__(_+Observations_, _+K_, _-Clusters_)  
-
-
-__centroid__(_+Observations_, _-Centroid_)  
-
-
-__vsum__(_+Vector1_, _+Vector2_, _-V_)  
-
-
-__vsub__(_+Vector1_, _+Vector2_, _-V_)  
-
-
-__innerprod__(_+Vector1_, _+Vector2_, _-R_)  
-
-
-__norm__(+_Vector_, _-N_)  
-
-
-__new_vector__(_+Name_, _+Vector_)  
-
 
 ### C
 
@@ -94,6 +51,53 @@ __print_observations__(_double ** observations_, _int observations size_, _int v
 __print_clusters__(_double *** clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
 
 
+### Common Lisp
+
+(__km__ _observations k_) → _clusters_  
+
+(__centroid__ _observations_) → _centroid_  
+
+(__vsum__ _vector1 vector2_) → _v_  
+
+(__vsub__ _vector1 vector2_) → _v_  
+
+(__innerprod__ _vector1 vector2_) → _v_  
+
+(__norm__ _vector_) → _v_  
+
+
+### Prolog
+
+__km__(_+Observations_, _+K_, _-Clusters_)  
+
+__centroid__(_+Observations_, _-Centroid_)  
+
+__vsum__(_+Vector1_, _+Vector2_, _-V_)  
+
+__vsub__(_+Vector1_, _+Vector2_, _-V_)  
+
+__innerprod__(_+Vector1_, _+Vector2_, _-R_)  
+
+__norm__(+_Vector_, _-N_)  
+
+__new_vector__(_+Name_, _+Vector_)  
+
+
+### Ruby
+
+__km__(_observations[][]_, _k_) → _clusters[][][]_  
+
+__centroid__(_observations[][]_) → _centroid[]_  
+
+__vsum__(_vector1[]_, _vector2[]_) → _vsum[]_  
+
+__vsub__(_vector1[]_, _vector2[]_) → _vsub[]_  
+
+__innerprod__(_vector1[]_, _vector2[]_) → _innerprod_  
+
+__norm__(_vector[]_) → _norm_
+
+
 ## Examples
 
 Consider the set of 2D Observations:
@@ -110,6 +114,31 @@ The three clusters (with k = 3) calculated with the K-Means algorithm are:
 1. {(1.0, 8.0), (3.0, 7.0), (4.0, 9.0)},
 2. {(0.5, 1.0), (0.8, 0.5), (0.9, 1.2)},
 3. {(6.0, 4.0), (7.0, 5.5), (9.0, 4.0)}.
+```
+
+### C
+
+```c
+int observations_size = 9;
+int vector_size = 2;
+int k = 3;
+
+print_observations(observations, observations_size, vector_size);
+
+double *** clusters = km(observations, k, observations_size, vector_size);
+print_clusters(clusters, k, observations_size, vector_size);
+```
+
+Output:
+
+```
+[(3.000000, 7.000000), (0.500000, 1.000000), (0.800000, 0.500000),
+ (1.000000, 8.000000), (0.900000, 1.200000), (6.000000, 4.000000),
+ (7.000000, 5.500000), (4.000000, 9.000000), (9.000000, 4.000000)]
+
+{[(0.500000, 1.000000), (0.800000, 0.500000), (0.900000, 1.200000)],
+ [(6.000000, 4.000000), (7.000000, 5.500000), (9.000000, 4.000000)],
+ [(3.000000, 7.000000), (1.000000, 8.000000), (4.000000, 9.000000)]}
 ```
 
 
@@ -175,27 +204,21 @@ Clusters = [[[1.0, 8.0], [3.0, 7.0], [4.0, 9.0]],
 ```
 
 
-### C
+### Ruby
 
-```c
-int observations_size = 9;
-int vector_size = 2;
-int k = 3;
+```ruby
+[1] pry(main)> observations = [[3.0, 7.0], [0.5, 1.0], [0.8, 0.5],
+                               [1.0, 8.0], [0.9, 1.2], [6.0, 4.0],
+                               [7.0, 5.5], [4.0, 9.0], [9.0, 4.0]]
+=> [[3.0, 7.0], [0.5, 1.0], [0.8, 0.5],
+    [1.0, 8.0], [0.9, 1.2], [6.0, 4.0],
+	[7.0, 5.5], [4.0, 9.0], [9.0, 4.0]]
 
-print_observations(observations, observations_size, vector_size);
+[2] pry(main)> k = 3
+=> 3
 
-double *** clusters = km(observations, k, observations_size, vector_size);
-print_clusters(clusters, k, observations_size, vector_size);
-```
-
-Output:
-
-```
-[(3.000000, 7.000000), (0.500000, 1.000000), (0.800000, 0.500000),
- (1.000000, 8.000000), (0.900000, 1.200000), (6.000000, 4.000000),
- (7.000000, 5.500000), (4.000000, 9.000000), (9.000000, 4.000000)]
-
-{[(0.500000, 1.000000), (0.800000, 0.500000), (0.900000, 1.200000)],
- [(6.000000, 4.000000), (7.000000, 5.500000), (9.000000, 4.000000)],
- [(3.000000, 7.000000), (1.000000, 8.000000), (4.000000, 9.000000)]}
+[3] pry(main)> km(observations, k)
+=> [[[0.5, 1.0], [0.8, 0.5], [0.9, 1.2]],
+ 	[[6.0, 4.0], [7.0, 5.5], [9.0, 4.0]],
+	[[3.0, 7.0], [1.0, 8.0], [4.0, 9.0]]]
 ```
