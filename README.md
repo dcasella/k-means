@@ -36,13 +36,13 @@ __km__(_double ** observations_, _int k_, _int observations size_, _int vector s
 
 __centroid__(_double ** observations_, _int observations size_, _int vector size_) → _double * centroid_  
 
-__vsum__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vsum_  
+__vsum__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vector_  
 
-__vsub__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vsub_  
+__vsub__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vector_  
 
-__innerprod__(_double * vector1_, _double * vector2_, _int vector size_) → _double innerprod_  
+__innerprod__(_double * vector1_, _double * vector2_, _int vector size_) → _double value_  
 
-__norm__(_double * vector_, _int vector size_) → _double norm_  
+__norm__(_double * vector_, _int vector size_) → _double value_  
 
 __print_vector__(_double * vector_, _int vector size_) → _void_   
 
@@ -57,13 +57,13 @@ __print_clusters__(_double *** clusters_, _int k_, _int observations size_, _int
 
 (__centroid__ _observations_) → _centroid_  
 
-(__vsum__ _vector1 vector2_) → _v_  
+(__vsum__ _vector1 vector2_) → _vector_  
 
-(__vsub__ _vector1 vector2_) → _v_  
+(__vsub__ _vector1 vector2_) → _vector_  
 
-(__innerprod__ _vector1 vector2_) → _v_  
+(__innerprod__ _vector1 vector2_) → _value_  
 
-(__norm__ _vector_) → _v_  
+(__norm__ _vector_) → _value_  
 
 
 ### Prolog
@@ -72,30 +72,30 @@ __km__(_+Observations_, _+K_, _-Clusters_)
 
 __centroid__(_+Observations_, _-Centroid_)  
 
-__vsum__(_+Vector1_, _+Vector2_, _-V_)  
+__vsum__(_+Vector1_, _+Vector2_, _-Vector_)  
 
-__vsub__(_+Vector1_, _+Vector2_, _-V_)  
+__vsub__(_+Vector1_, _+Vector2_, _-Vector_)  
 
-__innerprod__(_+Vector1_, _+Vector2_, _-R_)  
+__innerprod__(_+Vector1_, _+Vector2_, _-Value_)  
 
-__norm__(+_Vector_, _-N_)  
+__norm__(+_Vector_, _-Value_)  
 
 __new_vector__(_+Name_, _+Vector_)  
 
 
 ### Ruby
 
-__km__(_observations[][]_, _k_) → _clusters[][][]_  
+__km__(_observations_, _k_) → _clusters_  
 
-__centroid__(_observations[][]_) → _centroid[]_  
+__centroid__(_observations_) → _centroid_  
 
-__vsum__(_vector1[]_, _vector2[]_) → _vsum[]_  
+__vsum__(_vector1_, _vector2_) → _vector_  
 
-__vsub__(_vector1[]_, _vector2[]_) → _vsub[]_  
+__vsub__(_vector1_, _vector2_) → _vector_  
 
-__innerprod__(_vector1[]_, _vector2[]_) → _innerprod_  
+__innerprod__(_vector1_, _vector2_) → _value_  
 
-__norm__(_vector[]_) → _norm_
+__norm__(_vector_) → _value_  
 
 
 ## Examples
