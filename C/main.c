@@ -15,13 +15,16 @@ int main(int argc, char * argv[]) {
 		/* Make sure you update observations_size, vector_size and k
 		 * accordingly to your needs
 		 */
+		double **observations;
+		double ***clusters;
 
-		double **observations = (double **) malloc(sizeof(double *) * observations_size);
+		observations = (double **) malloc(sizeof(double *) * observations_size);
 		for (int i = 0; i < observations_size; i++)
 			observations[i] = (double *) malloc(sizeof(double) * vector_size);
 
 		if ((fp = fopen(filename, "r+")) == NULL) {
 			printf("No such file or directory\n");
+			free(observations);
 			exit(1);
 		}
 
@@ -33,10 +36,13 @@ int main(int argc, char * argv[]) {
 		print_observations(observations, observations_size, vector_size);
 		printf("\n\n");
 
-		double ***clusters = km(observations, k, observations_size, vector_size);
+		clusters = km(observations, k, observations_size, vector_size);
 		printf("Clusters:\n");
 		print_clusters(clusters, k, observations_size, vector_size);
 		printf("\n");
+
+		free(observations);
+		free(clusters);
 	}
 
 	return 0;

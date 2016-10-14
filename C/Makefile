@@ -12,4 +12,4 @@ km.o: src/km.c
 	$(CC) -c src/km.c -o km.o
 
 clean:
-	rm *.o
+	rm *.o *.exe

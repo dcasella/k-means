@@ -8,9 +8,9 @@
 #define ERR_NO_NUM -1
 #define ERR_NO_MEM -2
 
+
 int *clusters_sizes;
 
-// Implementation
 void print_vector(double *vector, int vector_size) {
 	printf("(");
 
@@ -18,8 +18,7 @@ void print_vector(double *vector, int vector_size) {
 		if (i > 0)
 			printf(", ");
 
-		//printf("%.2f", vector[i]);  // to print only 2 decimal values
-		printf("%f", vector[i]);
+		printf("%.2f", vector[i]);
 	}
 
 	printf(")");
@@ -48,10 +47,12 @@ void print_clusters(double ***clusters, int k, int observations_size, int vector
 		print_observations(clusters[i], clusters_sizes[i], vector_size);
 	}
 
+	free(clusters_sizes);
+
 	printf("}");
 }
 
-int compare_clusters(int *clusters_map1, int *clusters_map2, int clusters_size) {
+int compare_clusters(const int *clusters_map1, const int *clusters_map2, int clusters_size) {
 	for (int i = 0; i < clusters_size; i++) {
 		if (clusters_map1[i] != clusters_map2[i])
 			return 0;
@@ -106,7 +107,7 @@ double *centroid(double **observations, int observations_size, int vector_size) 
 	return vector;
 }
 
-double *vsum(double *vector1, double *vector2, int vector_size) {
+double *vsum(const double *vector1, const double *vector2, int vector_size) {
 	double *vector = (double *) malloc(sizeof(double) * vector_size);
 
 	for (int i = 0; i < vector_size; i++)
@@ -115,7 +116,7 @@ double *vsum(double *vector1, double *vector2, int vector_size) {
 	return vector;
 }
 
-double *vsub(double *vector1, double *vector2, int vector_size) {
+double *vsub(const double *vector1, const double *vector2, int vector_size) {
 	double *vector = (double *) malloc(sizeof(double) * vector_size);
 
 	for (int i = 0; i < vector_size; i++)
@@ -124,7 +125,7 @@ double *vsub(double *vector1, double *vector2, int vector_size) {
 	return vector;
 }
 
-double innerprod(double *vector1, double *vector2, int vector_size) {
+double innerprod(const double *vector1, const double *vector2, int vector_size) {
 	double prod = 0;
 
 	for (int i = 0; i < vector_size; i++)
@@ -133,7 +134,7 @@ double innerprod(double *vector1, double *vector2, int vector_size) {
 	return prod;
 }
 
-double norm(double *vector, int vector_size) {
+double norm(const double *vector, int vector_size) {
 	return sqrt(innerprod(vector, vector, vector_size));
 }
 
@@ -247,7 +248,7 @@ double ***map_clusters(int *clusters_map, double **observations, int k, int obse
 	return clusters;
 }
 
-double **map_cluster(int *clusters_map, double **observations, int c, int observations_size, int vector_size) {
+double **map_cluster(const int *clusters_map, double **observations, int c, int observations_size, int vector_size) {
 	int count = 0;
 	int *temp_arr = (int *) malloc(sizeof(int *) * observations_size);
 
