@@ -7,6 +7,7 @@ The Project consists in Common Lisp, Prolog and C libraries implementing Lloyd's
 
 
 Lloyd's __k-means algorithm__: pseudo-code
+
 ```ruby
 1: KM(n observations, k) → k clusters
 2:     cs ← Initialize(k)
@@ -17,7 +18,7 @@ Lloyd's __k-means algorithm__: pseudo-code
 7:     else
 8:         clusters ← clusters0
 9:         cs ← RecomputeCentroids(clusters)
-10:        goto 3
+10:        goto 4
 11:    end if
 ```
 
