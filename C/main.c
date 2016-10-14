@@ -7,14 +7,13 @@
 int main(int argc, char * argv[]) {
 	if (argc > 4) {
 		FILE *fp;
-		// Initialization
 		char *filename = argv[1];
-		int observations_size = atoi(argv[2]);
-		int vector_size = atoi(argv[3]);
-		int k = atoi(argv[4]);
 		/* Make sure you update observations_size, vector_size and k
 		 * accordingly to your needs
 		 */
+		int observations_size = atoi(argv[2]);
+		int vector_size = atoi(argv[3]);
+		int k = atoi(argv[4]);
 		double **observations;
 		double ***clusters;
 
@@ -43,6 +42,7 @@ int main(int argc, char * argv[]) {
 
 		free(observations);
 		free(clusters);
+		fclose(fp);
 	}
 
 	return 0;
