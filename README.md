@@ -126,7 +126,7 @@ int k = 3;
 
 print_observations(observations, observations_size, vector_size);
 
-double *** clusters = km(observations, k, observations_size, vector_size);
+double ***clusters = km(observations, k, observations_size, vector_size);
 print_clusters(clusters, k, observations_size, vector_size);
 ```
 
@@ -208,18 +208,18 @@ Clusters = [[[1.0, 8.0], [3.0, 7.0], [4.0, 9.0]],
 ### Ruby
 
 ```ruby
-[1] pry(main)> observations = [[3.0, 7.0], [0.5, 1.0], [0.8, 0.5],
-                               [1.0, 8.0], [0.9, 1.2], [6.0, 4.0],
-                               [7.0, 5.5], [4.0, 9.0], [9.0, 4.0]]
+pry(main)> observations = [[3.0, 7.0], [0.5, 1.0], [0.8, 0.5],
+                           [1.0, 8.0], [0.9, 1.2], [6.0, 4.0],
+                           [7.0, 5.5], [4.0, 9.0], [9.0, 4.0]]
 => [[3.0, 7.0], [0.5, 1.0], [0.8, 0.5],
     [1.0, 8.0], [0.9, 1.2], [6.0, 4.0],
-	[7.0, 5.5], [4.0, 9.0], [9.0, 4.0]]
+    [7.0, 5.5], [4.0, 9.0], [9.0, 4.0]]
 
-[2] pry(main)> k = 3
+pry(main)> k = 3
 => 3
 
-[3] pry(main)> km(observations, k)
+pry(main)> km(observations, k)
 => [[[0.5, 1.0], [0.8, 0.5], [0.9, 1.2]],
- 	[[6.0, 4.0], [7.0, 5.5], [9.0, 4.0]],
-	[[3.0, 7.0], [1.0, 8.0], [4.0, 9.0]]]
+    [[6.0, 4.0], [7.0, 5.5], [9.0, 4.0]],
+    [[3.0, 7.0], [1.0, 8.0], [4.0, 9.0]]]
 ```
