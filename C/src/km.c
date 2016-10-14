@@ -66,9 +66,11 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 	int *clusters_map = (int *) malloc(sizeof(int) * observations_size);
 	int *new_clusters_map = (int *) malloc(sizeof(int) * observations_size);
 	double **cs = (double **) malloc(sizeof(double *) * k);
+	/*
+	 * Why initialize every cs[i] when at #74 you assign something to cs?
 	for (int i = 0; i < k; i++)
 		cs[i] = (double *) malloc(sizeof(double) * vector_size);
-
+	*/
 	cs = initialize(observations, k, observations_size, vector_size);
 
 	if (observations_size < k) {
@@ -77,6 +79,8 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 		free(clusters_map);
 		free(new_clusters_map);
 		free(cs);
+		/* Just in case you think about freeing every cs[i]... DON'T.
+		 * cs[i] points to a vector in observations */
 		exit(1);
 	}
 
@@ -89,8 +93,12 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 
 			return map_clusters(clusters_map, observations, k, observations_size, vector_size);
 		}
-
+		/* WHY MEMCPY? "sei tardo?!?1?!"
+		 * also remember to free old cluster map, you don't need them
 		memcpy(clusters_map, new_clusters_map, sizeof(int) * observations_size);
+		*/
+		free(clusters_map);
+		cluster_maps = new_clusters_map;
 		cs = re_centroids(clusters_map, observations, k, observations_size, vector_size);
 	}
 }
@@ -173,6 +181,8 @@ int rand_num(int size) {
 
 double **initialize(double **observations, int k, int observations_size, int vector_size) {
 	double **centroids = (double **) malloc(sizeof(double *) * k);
+	/* Just in case you think about removing also this malloc after seeing my changes - DON'T
+	 * See #194, this is exactly when this is needed */
 	for (int i = 0; i < k; i++)
 		centroids[i] = (double *) malloc(sizeof(double) * vector_size);
 
@@ -213,13 +223,16 @@ int *partition(double **observations, double **cs, int k, int observations_size,
 
 double **re_centroids(int *clusters_map, double **observations, int k, int observations_size, int vector_size) {
 	double **centroids = (double **) malloc(sizeof(double *) * k);
+	/* No need to allocate space that will not be written
+	 * centroids[i] will point somewhere at #246
 	for (int i = 0; i < k; i++)
 		centroids[i] = (double *) malloc(sizeof(double) * vector_size);
-
+	*/
 	double **temp_arr = (double **) malloc(sizeof(double *) * observations_size);
+	/* Same as above, see #241
 	for (int i = 0; i < observations_size; i++)
 		temp_arr[i] = (double *) malloc(sizeof(double) * vector_size);
-
+	*/
 	for (int c = 0, count = 0; c < k; c++) {
 		for (int i = 0; i < observations_size; i++) {
 			int curr = clusters_map[i];
@@ -241,6 +254,8 @@ double **re_centroids(int *clusters_map, double **observations, int k, int obser
 
 double ***map_clusters(int *clusters_map, double **observations, int k, int observations_size, int vector_size) {
 	double ***clusters = (double ***) malloc(sizeof(double **) * k);
+	
+	/* for some reasons here you didn't thought about malloc-ing everything, nice */
 
 	for (int i = 0; i < k; i++)
 		clusters[i] = map_cluster(clusters_map, observations, i, observations_size, vector_size);
@@ -250,7 +265,7 @@ double ***map_clusters(int *clusters_map, double **observations, int k, int obse
 
 double **map_cluster(const int *clusters_map, double **observations, int c, int observations_size, int vector_size) {
 	int count = 0;
-	int *temp_arr = (int *) malloc(sizeof(int *) * observations_size);
+	int *temp_arr = (int *) malloc(sizeof(int) * observations_size);
 
 	for (int i = 0; i < observations_size; i++) {
 		if (clusters_map[i] == c) {
@@ -260,9 +275,14 @@ double **map_cluster(const int *clusters_map, double **observations, int c, int 
 	}
 
 	double **cluster = (double **) malloc(sizeof(double *) * count);
+	/* 1)
+	 * 	i from 0 to observation_size
+	 * 	but #277 allocates a number of "double *" equal to "count"
+	 * 2)
+	 *	again, why allocate space that will be overwritten at #287 ?
 	for (int i = 0; i < observations_size; i++)
 		cluster[i] = (double *) malloc(sizeof(double) * vector_size);
-
+	*/
 	for (int i = 0; i < count; i++)
 		cluster[i] = observations[temp_arr[i]];
 
