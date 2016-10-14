@@ -9,7 +9,8 @@ if ARGV.length > 1
 	k = ARGV[1].to_i
 
 	file_obj.each_line do |line|
-		observations[file_obj.lineno - 1] = line.split("\t").map(&:to_f)
+		line.chomp!
+		observations[file_obj.lineno - 1] = line.split(" ").map(&:to_f)
 	end
 
 	print km(observations, k), "\n"
