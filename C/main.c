@@ -4,7 +4,7 @@
 
 // Example main() with file importing and k-means execution
 
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[]) {
 	if (argc > 4) {
 		FILE *fp;
 		char *filename = argv[1];
@@ -23,13 +23,16 @@ int main(int argc, char * argv[]) {
 
 		if ((fp = fopen(filename, "r+")) == NULL) {
 			printf("No such file or directory\n");
+			for (int i=0 ; i<observations_size ; ++i)
+				free(observations[i]);
 			free(observations);
 			exit(1);
 		}
 
-		for (int i = 0; i < observations_size; i++)
+		for (int i = 0; i < observations_size; i++) {
 			for (int j = 0; j < vector_size; j++)
 				fscanf(fp, "%lf", &observations[i][j]);
+		}
 
 		printf("Observations:\n");
 		print_observations(observations, observations_size, vector_size);
@@ -39,9 +42,14 @@ int main(int argc, char * argv[]) {
 		printf("Clusters:\n");
 		print_clusters(clusters, k, observations_size, vector_size);
 		printf("\n");
-
-		free(observations);
+			
+		for (int i=0 ; i<k ; ++i)
+			free(clusters[i]);
 		free(clusters);
+
+		for (int i=0 ; i<observations_size ; ++i) 
+			free(observations[i]);
+		free(observations);
 		fclose(fp);
 	}
 

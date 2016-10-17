@@ -7,7 +7,7 @@
 #include <time.h>
 #define ERR_NO_NUM -1
 #define ERR_NO_MEM -2
-
+#define FREED_RAND -3
 
 int *clusters_sizes;
 
@@ -77,22 +77,30 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 		free(clusters_sizes);
 		free(clusters_map);
 		free(new_clusters_map);
+		for (int i = 0; i < k; ++i)
+			free(cs[i]);
 		free(cs);
 		exit(1);
 	}
 
 	while (1) {
 		new_clusters_map = partition(observations, cs, k, observations_size, vector_size);
-
+		
 		if (compare_clusters(clusters_map, new_clusters_map, observations_size)) {
 			free(new_clusters_map);
+			for (int i = 0; i < k; ++i)
+				free(cs[i]);
 			free(cs);
-
-			return map_clusters(clusters_map, observations, k, observations_size, vector_size);
+			double ***mapped = map_clusters(clusters_map, observations, k, observations_size, vector_size);
+			free(clusters_map);
+			return mapped;
 		}
 
 		free(clusters_map);
 		clusters_map = new_clusters_map;
+		for (int i = 0; i < k; ++i)
+			free(cs[i]);
+		free(cs);
 		cs = re_centroids(clusters_map, observations, k, observations_size, vector_size);
 	}
 }
@@ -100,9 +108,11 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 double *centroid(double **observations, int observations_size, int vector_size) {
 	double *vector = (double *) calloc(vector_size, sizeof(double));
 
-	for (int i = 0; i < observations_size; ++i)
-		vector = vsum(vector, observations[i], vector_size);
-
+	for (int i = 0; i < observations_size; ++i) {
+		double *temp = vsum(vector, observations[i], vector_size);
+		free(vector);
+		vector = temp;
+	}
 	for (int i = 0; i < vector_size; ++i)
 		vector[i] /= observations_size;
 
@@ -148,6 +158,11 @@ int rand_num(int size) {
 	static int numNums = 0;
 	static int *numArr = NULL;
 
+	if (size == -22) {
+		free(numArr);
+		return FREED_RAND;
+	}
+
 	if (size >= 0) {
 		if (numArr != NULL)
 			free(numArr);
@@ -176,20 +191,18 @@ int rand_num(int size) {
 double **initialize(double **observations, int k, int observations_size, int vector_size) {
 	double **centroids = (double **) malloc(sizeof(double *) * k);
 
-	for (int i = 0; i < k; ++i)
-		centroids[i] = (double *) malloc(sizeof(double) * vector_size);
-
 	srand(time(NULL));
 	int r = rand_num(observations_size);
 
 	for (int i = 0; i < k; ++i) {
+		centroids[i] = (double *) malloc(sizeof(double) * vector_size);
 		for (int j = 0; j < vector_size; ++j) {
 			centroids[i][j] = observations[r][j];
+			r = rand_num(-1);
 		}
-
-		r = rand_num(-1);
 	}
 
+	rand_num(-22);
 	return centroids;
 }
 
@@ -202,10 +215,12 @@ int *partition(double **observations, double **cs, int k, int observations_size,
 		float min_distance = DBL_MAX;
 
 		for (int c = 0; c < k; ++c) {
-			if ((curr_distance = norm(vsub(observations[i], cs[c], vector_size), vector_size)) < min_distance) {
+			double *temp = vsub(observations[i], cs[c], vector_size);
+			if ((curr_distance = norm(temp, vector_size)) < min_distance) {
 				min_distance = curr_distance;
 				centroid = c;
 			}
+			free(temp);
 		}
 
 		clusters_map[i] = centroid;
@@ -217,9 +232,6 @@ int *partition(double **observations, double **cs, int k, int observations_size,
 double **re_centroids(int *clusters_map, double **observations, int k, int observations_size, int vector_size) {
 	double **centroids = (double **) malloc(sizeof(double *) * k);
 	double **temp_arr = (double **) malloc(sizeof(double *) * observations_size);
-
-	for (int i = 0; i < observations_size; ++i)
-		temp_arr[i] = (double *) malloc(sizeof(double) * vector_size);
 
 	for (int c = 0, count = 0; c < k; ++c) {
 		for (int i = 0; i < observations_size; ++i) {

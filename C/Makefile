@@ -1,15 +1,16 @@
-CC = gcc
+CC = gcc -g
 CFLAGS = -Iinclude
-OPT = -lm
+CLINK = -lm
+OPT =
 
 main.exe: main.o km.o
-	$(CC) main.o km.o -o main.exe $(OPT)
+	$(CC) main.o km.o -o main.exe $(CLINK)
 
 main.o: main.c
-	$(CC) $(CFLAGS) -c main.c -o main.o
+	$(CC) $(CFLAGS) $(OPT) -c main.c -o main.o
 
 km.o: src/km.c
-	$(CC) -c src/km.c -o km.o
+	$(CC) $(OPT) -c src/km.c -o km.o
 
 clean:
 	rm *.o *.exe
