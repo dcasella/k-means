@@ -67,40 +67,38 @@ int compare_clusters(const int *clusters_map1, const int *clusters_map2, int clu
 double ***km(double **observations, int k, int observations_size, int vector_size) {
 	clusters_sizes = (int *) calloc(k, sizeof(int));
 	int *clusters_map = (int *) calloc(observations_size, sizeof(int));
-	int *new_clusters_map = (int *) malloc(sizeof(int) * observations_size);
-	double **cs = (double **) malloc(sizeof(double *) * k);
-
-	cs = initialize(observations, k, observations_size, vector_size);
+	double **cs = initialize(observations, k, observations_size, vector_size);
 
 	if (observations_size < k) {
 		printf("Can't compute clusters.");
-		free(clusters_sizes);
-		free(clusters_map);
-		free(new_clusters_map);
 		for (int i = 0; i < k; ++i)
 			free(cs[i]);
 		free(cs);
+		free(clusters_map);
+		free(clusters_sizes);
+
 		exit(1);
 	}
 
 	while (1) {
-		new_clusters_map = partition(observations, cs, k, observations_size, vector_size);
-		
+		int *new_clusters_map = partition(observations, cs, k, observations_size, vector_size);
+
 		if (compare_clusters(clusters_map, new_clusters_map, observations_size)) {
-			free(new_clusters_map);
+			double ***clusters = map_clusters(clusters_map, observations, k, observations_size, vector_size);
 			for (int i = 0; i < k; ++i)
 				free(cs[i]);
 			free(cs);
-			double ***mapped = map_clusters(clusters_map, observations, k, observations_size, vector_size);
 			free(clusters_map);
-			return mapped;
+			free(new_clusters_map);
+
+			return clusters;
 		}
 
-		free(clusters_map);
-		clusters_map = new_clusters_map;
 		for (int i = 0; i < k; ++i)
 			free(cs[i]);
 		free(cs);
+		free(clusters_map);
+		clusters_map = new_clusters_map;
 		cs = re_centroids(clusters_map, observations, k, observations_size, vector_size);
 	}
 }
@@ -113,6 +111,7 @@ double *centroid(double **observations, int observations_size, int vector_size) 
 		free(vector);
 		vector = temp;
 	}
+
 	for (int i = 0; i < vector_size; ++i)
 		vector[i] /= observations_size;
 
@@ -154,9 +153,9 @@ double norm(const double *vector, int vector_size) {
  * Source: http://stackoverflow.com/a/5064432
  */
 int rand_num(int size) {
-	int i, n;
-	static int numNums = 0;
 	static int *numArr = NULL;
+	static int numNums = 0;
+	int i, n;
 
 	if (size == -22) {
 		free(numArr);
@@ -166,10 +165,13 @@ int rand_num(int size) {
 	if (size >= 0) {
 		if (numArr != NULL)
 			free(numArr);
+
 		if ((numArr = (int *) malloc(sizeof(int) * size)) == NULL)
 			return ERR_NO_MEM;
+
 		for (i = 0; i < size; ++i)
 			numArr[i] = i;
+
 		numNums = size;
 	}
 
@@ -180,6 +182,7 @@ int rand_num(int size) {
 	i = numArr[n];
 	numArr[n] = numArr[numNums - 1];
 	numNums--;
+
 	if (numNums == 0) {
 		free(numArr);
 		numArr = 0;
@@ -203,6 +206,7 @@ double **initialize(double **observations, int k, int observations_size, int vec
 	}
 
 	rand_num(-22);
+
 	return centroids;
 }
 
@@ -216,10 +220,12 @@ int *partition(double **observations, double **cs, int k, int observations_size,
 
 		for (int c = 0; c < k; ++c) {
 			double *temp = vsub(observations[i], cs[c], vector_size);
+
 			if ((curr_distance = norm(temp, vector_size)) < min_distance) {
 				min_distance = curr_distance;
 				centroid = c;
 			}
+			
 			free(temp);
 		}
 
