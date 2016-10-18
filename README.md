@@ -33,23 +33,23 @@ Lloyd's __k-means algorithm__: pseudo-code
 
 ### C
 
-__km__(_double ** observations_, _int k_, _int observations size_, _int vector size_) → _double *** clusters_  
+__km__(_double **observations_, _int k_, _int observations size_, _int vector size_) → _double ***clusters_  
 
-__centroid__(_double ** observations_, _int observations size_, _int vector size_) → _double * centroid_  
+__centroid__(_double **observations_, _int observations size_, _int vector size_) → _double *centroid_  
 
-__vsum__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vector_  
+__vsum__(_double *vector1_, _double *vector2_, _int vector size_) → _double *vector_  
 
-__vsub__(_double * vector1_, _double * vector2_, _int vector size_) → _double * vector_  
+__vsub__(_double *vector1_, _double *vector2_, _int vector size_) → _double *vector_  
 
-__innerprod__(_double * vector1_, _double * vector2_, _int vector size_) → _double value_  
+__innerprod__(_double *vector1_, _double *vector2_, _int vector size_) → _double value_  
 
-__norm__(_double * vector_, _int vector size_) → _double value_  
+__norm__(_double *vector_, _int vector size_) → _double value_  
 
-__print_vector__(_double * vector_, _int vector size_) → _void_   
+__print_vector__(_double *vector_, _int vector size_) → _void_   
 
-__print_observations__(_double ** observations_, _int observations size_, _int vector size_) → _void_  
+__print_observations__(_double **observations_, _int observations size_, _int vector size_) → _void_  
 
-__print_clusters__(_double *** clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
+__print_clusters__(_double ***clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
 
 
 ### Common Lisp
@@ -132,14 +132,14 @@ print_clusters(clusters, k, observations_size, vector_size);
 
 Output:
 
-```
-[(3.000000, 7.000000), (0.500000, 1.000000), (0.800000, 0.500000),
- (1.000000, 8.000000), (0.900000, 1.200000), (6.000000, 4.000000),
- (7.000000, 5.500000), (4.000000, 9.000000), (9.000000, 4.000000)]
+```c
+[(3.00, 7.00), (0.50, 1.00), (0.80, 0.50),
+ (1.00, 8.00), (0.90, 1.20), (6.00, 4.00),
+ (7.00, 5.50), (4.00, 9.00), (9.00, 4.00)]
 
-{[(0.500000, 1.000000), (0.800000, 0.500000), (0.900000, 1.200000)],
- [(6.000000, 4.000000), (7.000000, 5.500000), (9.000000, 4.000000)],
- [(3.000000, 7.000000), (1.000000, 8.000000), (4.000000, 9.000000)]}
+{[(0.50, 1.00), (0.80, 0.50), (0.90, 1.20)],
+ [(6.00, 4.00), (7.00, 5.50), (9.00, 4.00)],
+ [(3.00, 7.00), (1.00, 8.00), (4.00, 9.00)]}
 ```
 
 
