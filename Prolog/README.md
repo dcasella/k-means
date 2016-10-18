@@ -3,7 +3,7 @@
 ## Interface
 
 ```prolog
-km(+Observations, K, -Clusters)
+km(+Observations, +K, -Clusters)
 
 centroid(+Observations, -Centroid)
 
