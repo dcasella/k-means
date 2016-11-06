@@ -25,8 +25,8 @@ Lloyd's __k-means algorithm__: pseudo-code
 
 ## List of contents
 
-- [Interface](#interface)
-- [Examples](#examples)
+- [Interface](#interface)  
+- [Examples](#examples)  
 &nbsp;
 
 ## Interface
