@@ -23,7 +23,7 @@ Calculate the vector difference of two vectors."
 Calculate the centroid of the set of observations."
   (cond ((null observations) NIL)
         (T (mapcar #'(lambda (coord) (/ coord (length observations)))
-                   (reduce #'vsum observations)))))
+             (reduce #'vsum observations)))))
 
 (defun innerprod (vector1 vector2)
 "Parameter vector1, vector (list of coordinates).
@@ -43,7 +43,7 @@ Create k starting centroids using Forgy's method.
 Forgy's method: randomly select k of the starting observations."
   (cond ((= k 0) NIL)
         (T (let ((rand (nth (random (length observations)) observations)))
-                (cons rand (initialize (remove rand observations) (- k 1)))))))
+             (cons rand (initialize (remove rand observations) (- k 1)))))))
 
 (defun map-cluster (clusters-map observations cl index)
 "Parameter clusters-map, list of indices.
@@ -85,9 +85,9 @@ the lowest calculated."
   (cond ((null cs) result)
         ((null (car cs)) (pick-centroid v (cdr cs) old-distance result))
         (T (let* ((c (car cs)) (new-distance (norm (vsub v c))))
-                 (cond ((< new-distance old-distance)
-                        (pick-centroid v (cdr cs) new-distance c))
-                       (T (pick-centroid v (cdr cs) old-distance result)))))))
+             (cond ((< new-distance old-distance)
+                    (pick-centroid v (cdr cs) new-distance c))
+                   (T (pick-centroid v (cdr cs) old-distance result)))))))
 
 (defun partition (observations cs)
 "Parameter observations, list of vectors (or lists).
@@ -109,11 +109,11 @@ Parameter cs, list of centroids.
 Parameter k, number of clusters to generate.
 Returns the Clusters-Map, or a list of cluster's indices."
   (let ((new-clusters (partition observations cs)))
-       (cond ((equal clusters new-clusters) clusters)
-       (T (lloyd-km observations
-                    new-clusters
-                    (re-centroids new-clusters observations k)
-                    k)))))
+    (cond ((equal clusters new-clusters) clusters)
+    (T (lloyd-km observations
+                 new-clusters
+                 (re-centroids new-clusters observations k)
+                 k)))))
 
 (defun km (observations k)
 "Parameter observations, list of vectors (or lists).
