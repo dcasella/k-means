@@ -4,7 +4,7 @@ One of the main (and simplier) algorithms used in data statistics analysis is kn
 The objective to a clustering algorithm is, given a group of n objects (or observations), partition them into k subsets (or categories) which assemble the objects sharing some properties.  
 Particularly, the clustering algorithm k-means partitions n observations into k clusters (groups), where every observation belongs to the group where the centroid is the nearest.  
 The Project consists in Common Lisp, Prolog and C libraries implementing Lloyd's k-means algorithm.
-
+&nbsp;
 
 Lloyd's __k-means algorithm__: pseudo-code
 
@@ -21,13 +21,13 @@ Lloyd's __k-means algorithm__: pseudo-code
 10:        goto 4
 11:    end if
 ```
-
+&nbsp;
 
 ## List of contents
 
 - [Interface](#interface)
 - [Examples](#examples)
-
+&nbsp;
 
 ## Interface
 
@@ -50,7 +50,7 @@ __print_vector__(_double *vector_, _int vector size_) → _void_
 __print_observations__(_double **observations_, _int observations size_, _int vector size_) → _void_  
 
 __print_clusters__(_double ***clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
-
+&nbsp;
 
 ### Common Lisp
 
@@ -65,7 +65,7 @@ __print_clusters__(_double ***clusters_, _int k_, _int observations size_, _int 
 (__innerprod__ _vector1 vector2_) → _value_  
 
 (__norm__ _vector_) → _value_  
-
+&nbsp;
 
 ### Prolog
 
@@ -82,7 +82,7 @@ __innerprod__(_+Vector1_, _+Vector2_, _-Value_)
 __norm__(+_Vector_, _-Value_)  
 
 __new_vector__(_+Name_, _+Vector_)  
-
+&nbsp;
 
 ### Ruby
 
@@ -97,7 +97,7 @@ __vsub__(_vector1_, _vector2_) → _vector_
 __innerprod__(_vector1_, _vector2_) → _value_  
 
 __norm__(_vector_) → _value_  
-
+&nbsp;
 
 ## Examples
 
@@ -141,7 +141,7 @@ Output:
  [(6.00, 4.00), (7.00, 5.50), (9.00, 4.00)],
  [(3.00, 7.00), (1.00, 8.00), (4.00, 9.00)]}
 ```
-
+&nbsp;
 
 ### Common Lisp
 
@@ -171,7 +171,7 @@ CL prompt> (km observations 3)
  ((0.5 1.0) (0.8 0.5) (0.9 1.2))
  ((6.0 4.0) (7.0 5.5) (9.0 4.0)))
 ```
-
+&nbsp;
 
 ### Prolog
 
@@ -203,7 +203,7 @@ Clusters = [[[1.0, 8.0], [3.0, 7.0], [4.0, 9.0]],
             [[0.5, 1.0], [0.8, 0.5], [0.9, 1.2]]
             [[6.0, 4.0], [7.0, 5.5], [9.0, 4.0]]].
 ```
-
+&nbsp;
 
 ### Ruby
 
