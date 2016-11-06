@@ -7,11 +7,10 @@
 
 
 %%%%% km/3
-%% True quando Clusters unifica con una lista di K gruppi di vettori
-%% dell'insieme di osservazioni Observations
+%% True when Clusters unifies with a list of K groups of vectors
+%% from the set of Observations.
 %
 km(Observations, K, Clusters) :-
-	% Controlla che il numero di osservazioni sia maggiore di K
 	length(Observations, L),
 	L > K,
 	!,
@@ -19,28 +18,22 @@ km(Observations, K, Clusters) :-
 	lloyd_km(Observations, [], CS, K, ClustersMap),
 	map_clusters(ClustersMap, Observations, 0, K, Clusters).
 km(Observations, K, Observations) :-
-	% Se il numero di osservazioni coincide con K,
-	% Clusters unifica con Observations
 	length(Observations, L),
 	L =:= K, !.
 km(_, _, _) :-
 	print_message(error, "Can't compute clusters.").
 
 %%%%% centroid/2
-%% True quando Centroid unifica con il centroide dell'insieme di
-%% osservazioni Observations
+%% True when Centroid unifies with the centroid of the set Observations.
 %
 centroid(Observations, Centroid) :-
-	% Somma (facendo uso di vsum) le osservazioni
 	vsum_list(Observations, VSUM),
 	length(Observations, L),
-	% Dividi ogni coordinata del vettore generato da vsum_list per il
-	% numero di osservazioni
 	vdiv(VSUM, L, Centroid).
 centroid([], []).
 
 %%%%% vsum/3
-%% True quando VSUM unifica con la somma vettoriale fra Vector1 e Vector2
+%% True when VSUM unifies with the vector sum between Vector1 and Vector2.
 %
 vsum([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X + Y,
@@ -48,7 +41,7 @@ vsum([X | Vector1], [Y | Vector2], [Z | V]) :-
 vsum([], [], []).
 
 %%%% vsub/3
-%% True quando VSUB unifica con la differenza vettoriale fra Vector1 e Vector2
+%% True when VSUB unifies with the vector diff between Vector1 and Vector2.
 %
 vsub([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X - Y,
@@ -56,7 +49,7 @@ vsub([X | Vector1], [Y | Vector2], [Z | V]) :-
 vsub([], [], []).
 
 %%%% innerprod/3
-%% True quando IP unifica con il prodotto scalare fra Vector1 e Vector2
+%% True when IP unifies with the dot product between Vector1 and Vector2.
 %
 innerprod(Vector1, Vector2, IP) :-
 	vprod(Vector1, Vector2, T),
@@ -64,14 +57,14 @@ innerprod(Vector1, Vector2, IP) :-
 innerprod([], [], []).
 
 %%%% norm/2
-%% True quando Norm unifica con la norma di Vector
+%% True when Norm unifies with the Euclidean norm of Vector.
 %
 norm(Vector, Norm) :-
 	innerprod(Vector, Vector, P),
 	Norm is sqrt(P).
 
 %%%% new_vector/2
-%% True quando Il predicato asserisce il predicato vector(Name, Vector)
+%% True when the predicate asserts vector(Name, Vector) correctly.
 %
 new_vector(Name, Vector) :-
 	atom(Name),
@@ -79,15 +72,13 @@ new_vector(Name, Vector) :-
 	assert(vector(Name, Vector)).
 
 %%%% initialize/3
-%% True quando Centroids unifica con K vettori.
-%% Questi vettori sono i centroidi iniziali dell'algoritmo K-means,
-%% scelti utilizzando il metodo di Forgy;
-%% metodo di Forgy: sceglie casualmente k delle osservazioni iniziali
+%% True when Centroids unifies with K vectors.
+%% These vectors are K-means' algorithm starting centroids,
+%% selected using FOrgy's method;
+%% Forgy's method: randomly select K of the starting Observations.
 %
 initialize(_, 0, []) :- !.
 initialize([], K, [[] | CS]) :-
-	% Quando ci sono troppi vettori uguali in Observations
-	% questo predicato permette la continuazione dell'algoritmo
 	K > 0,
 	!,
 	J is K - 1,
@@ -96,37 +87,27 @@ initialize(Observations, K, [V | CS]) :-
 	K > 0,
 	length(Observations, L),
 	MaxL is L-1,
-	% Randomizza un indice N tra 0 e MaxL
 	random_between(0, MaxL, N),
-	% Estrai il vettore V di indice N
 	nth0(N, Observations, V),
-	% Rimuovi il vettore dalla lista Observations
 	delete(Observations, V, New_Observations),
 	J is K - 1,
 	initialize(New_Observations, J, CS).
 
 %%%% lloyd_km/4
-%% True quando Result unifica con una lista di K gruppi di vettori
-%% raggruppati per centroide
+%% True when Result unifies with a list of K groups of vectors
+%% grouped by centroid.
 %
 lloyd_km(Observations, Clusters, CS, K, Result) :-
-	% Calcola la lista di gruppi di vettori ottenuta raggruppando
-	% le Observations attorno ai centroidi CS(ovvero New_Clusters)
 	partition(Observations, CS, New_Clusters),
-	% Caso passo: i clusters calcolati nella ricorsione attuale sono diversi
-	% da quelli calcolati nella ricorsione precedente
 	Clusters \== New_Clusters,
 	!,
-	% Ricalcolo dei centroidi data la nuova lista New_Clusters
 	re_centroids(New_Clusters, Observations, K, New_CS),
 	lloyd_km(Observations, New_Clusters, New_CS, K, Result).
-% Caso base: Clusters unifica con Result perchè la condizione
-% Clusters \== New_Clusters è risultata false nella ricorsione precedente
 lloyd_km(_, Clusters, _, _, Clusters).
 
 %%%% partition/3
-%% True quando Result unifica con la ClustersMap che rappresenta la lista di
-%% indici dei Clusters ai quali corrisponde ogni elemento di Observations
+%% True when Result unifies with the ClustersMap which represents the list of
+%% Clusters' indices to whom correspond all elements of Observations.
 %
 partition([V | Observations], CS, [NTHC | Result]) :-
 	!,
@@ -137,8 +118,8 @@ partition([V | Observations], CS, [NTHC | Result]) :-
 partition([], _, []).
 
 %%%% pick_centroid/5
-%% True quando Result unifica con il centroide la cui distanza tra quest'ultimo
-%% e il vettore è la minore calcolata
+%% True when Result unifies with the centroid whose distance between itself
+%% and the vector is the lowest calculated.
 %
 pick_centroid(V, [[] | CS], D, R, Result) :-
 	!,
@@ -155,17 +136,17 @@ pick_centroid(V, [_ | CS], D, R, Result) :-
 pick_centroid(_, [], _, Result, Result).
 
 %%%% re_centroids/2
-%% True quando CS unifica con i K centroidi ricalcolati per tutte le K liste
-%% di vettori presenti nella lista Clusters, risultante dalla chiamata al
-%% predicato map_clusters (con input la lista ClustersMap)
+%% True when CS unifies with the K centroids re-calculated for every K list
+%% of vectors included in Clusters' list, which is produced as output of the
+%% predicate map_clusters (input: ClustersMap' list).
 %
 re_centroids(ClustersMap, Observations, K, CS) :-
 	map_clusters(ClustersMap, Observations, 0, K, Clusters),
 	maplist(centroid, Clusters, CS).
 
 %%%% vsum_list/2
-%% True quando VSUM unifica con la somma vettoriale di tutti i vettori
-%% presenti in Observatons
+%% True when VSUM unifies with the vector sum of all the vectors
+%% included in Observatons.
 %
 vsum_list([X | Xs], V) :-
 	identity(X, IE),
@@ -176,17 +157,16 @@ vsum_list([X | Xs], A, V) :-
 vsum_list([], V, V).
 
 %%%% identity/2
-%% True quando IE unifica con il proprio elemento identità,
-%% ovvero una lista di zeri
+%% True when IE unifies with itself's identity element, or a list of zeros.
 %
 identity([_ | Xs], [0 | IE]) :-
 	identity(Xs, IE).
 identity([], []).
 
 %%%% vdiv/3
-%% True quando Result unifica con il vettore le cui componenti sono
-%% la divisione tra le componenti del vettore Vector e L
-%% Predicato utilizzato in centroid/3 per il calcolo del centroide
+%% True when Result unifies with the vector whose components are
+%% the division between Vector's components and L.
+%% Predicate used in centroid/3 to calculate the centroid.
 %
 vdiv([X | Vector], L, [Q | V]) :-
 	Q is X / L,
@@ -194,10 +174,10 @@ vdiv([X | Vector], L, [Q | V]) :-
 vdiv([], _, []).
 
 %%%% vprod/3
-%% True quando Result unifica con il vettore le cui componenti sono
-%% il prodotto delle componenti corrispondenti dei vettori Vector1 e Vector2
-%% Predicato di appoggio di innerprod. Infatti se si sommano
-%% le componenti di Prod si ottiene il prodotto scalare fra Vector1 e Vector2
+%% True when Result unifies with the vector whose components are
+%% the product of Vector1 and Vector2's corresponding components.
+%% Support predicate for innerprod. In fact, if we sum Prod's components
+%% we obtain the dot product between Vector1 and Vector2.
 %
 vprod([X | Vector1], [Y | Vector2], [Z | V]) :-
 	Z is X * Y,
@@ -205,7 +185,7 @@ vprod([X | Vector1], [Y | Vector2], [Z | V]) :-
 vprod([], [], []).
 
 %%%% vector/1
-%% True quando l'argomento Vector è una lista di coordinate (numeri)
+%% True when the argument Vector is a list of coordinate (numbers)
 %
 vector([X | Vector]) :-
 	number(X),
@@ -213,9 +193,9 @@ vector([X | Vector]) :-
 vector([]).
 
 %%%% map_cluster/5
-%% True quando Result unifica con il Cluster di vettori (lista di liste) di
-%% indice CL, data la ClustersMap (lista di indici di Clusters) e la lista
-%% dei vettori di partenza, Observations
+%% True when Result unifies with the Cluster of vectors (list of lists) of
+%% index CL, given the ClustersMap (list of Clusters' indices) and
+%% the starting vectors' list, Observations.
 %
 map_cluster([CL | ClustersMap], Observations, CL, Index, [NTHV | Result]) :-
 	nth0(Index, Observations, NTHV),
@@ -229,9 +209,8 @@ map_cluster([_ | ClustersMap], Observations, CL, Index, Result) :-
 map_cluster([], _, _, _, []).
 
 %%%% map_clusters/5
-%% True quando Result unifica con la lista di K Clusters, data
-%% la ClustersMap (lista di indici di Clusters) e la lista
-%% dei vettori di partenza, Observations
+%% True when Result unifies with the list of K Clusters, given
+%% the ClustersMap (list of Clusters' indices) and Observations.
 %
 map_clusters(_, _, K, K, []) :- !.
 map_clusters(ClustersMap, Observations, CL, K, [Cluster | Result]) :-
