@@ -1,4 +1,4 @@
-# K-Means / C
+# K-Means > C
 
 ## Interface
 

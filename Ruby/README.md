@@ -1,4 +1,4 @@
-# K-Means / Ruby
+# K-Means > Ruby
 
 ## Interface
 

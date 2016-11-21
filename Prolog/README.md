@@ -1,4 +1,4 @@
-# K-Means / Prolog
+# K-Means > Prolog
 
 ## Interface
 
