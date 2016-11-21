@@ -27,7 +27,7 @@ CL prompt> v3
 (1 2 3)
 
 CL prompt> (srqt (innerprod V3 V3))
-3.7416575 ; Il risultato può variare.
+3.7416575
 
 CL prompt> (norm V3)
 3.7416575
