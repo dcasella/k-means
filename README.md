@@ -1,6 +1,6 @@
 # K-Means
 
-###### Translated and adapted from KM-201609 PDF written by Marco Antoniotti and Gabriella Pasi.
+> Translated and adapted from KM-201609 PDF written by Marco Antoniotti and Gabriella Pasi.
 
 One of the main (and simplier) algorithms used in data statistics analysis is known as the k-means unsupervised clustering algorithm.  
 The objective to a clustering algorithm is, given a group of n objects (or observations), partition them into k subsets (or categories) which assemble the objects sharing some properties.  
