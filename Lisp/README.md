@@ -1,4 +1,4 @@
-# K-Means > Lisp
+# K-Means > Common Lisp
 
 ## Interface
 

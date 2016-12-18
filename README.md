@@ -4,7 +4,7 @@
 
 One of the main (and simplier) algorithms used in data statistics analysis is known as the k-means unsupervised clustering algorithm.  
 The objective to a clustering algorithm is, given a group of n objects (or observations), partition them into k subsets (or categories) which assemble the objects sharing some properties.  
-Particularly, the clustering algorithm k-means partitions n observations into k clusters (groups), where every observation belongs to the group where the centroid is the nearest.  
+Particularly, the clustering algorithm k-means partitions n observations into k clusters (groups), where every observation belongs to the group whose centroid is the nearest.  
 The Project consists in Common Lisp, Prolog (University), C and Ruby (Personal) libraries implementing Lloyd's k-means algorithm.
 &nbsp;
 
