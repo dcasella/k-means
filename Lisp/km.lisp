@@ -124,7 +124,7 @@
 "Parameter observations, list of vectors (or lists).
 Parameter k, number of clusters to generate.
 Returns k clusters from the set of observations."
-  (cond ((< (length observations) k) (error "Can't compute clusters."))
+  (cond ((< (length observations) k) (error "Could not compute clusters."))
         ((= (length observations) k) observations)
         ((null observations) nil)
         (t (map-clusters (lloyd-km observations

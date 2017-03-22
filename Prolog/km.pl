@@ -21,7 +21,7 @@ km(Observations, K, Observations) :-
 	length(Observations, L),
 	L =:= K, !.
 km(_, _, _) :-
-	print_message(error, "Can't compute clusters.").
+	print_message(error, 'Could not compute clusters.').
 
 %%%%% centroid/2
 %% True when Centroid unifies with the centroid of the set Observations.

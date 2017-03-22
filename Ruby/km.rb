@@ -5,7 +5,7 @@ def km (observations, k)
 	return nil if observations.nil?
 	return [observations] if k == 1
 	return observations if observations.length == k
-	raise "Can't compute clusters" if observations.length < k
+	raise "Could not compute clusters" if observations.length < k
 	
 	clusters_map = []
 	cs = init(observations, k)

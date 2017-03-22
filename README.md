@@ -47,11 +47,11 @@ __innerprod__(_double *vector1_, _double *vector2_, _int vector size_) → _doub
 
 __norm__(_double *vector_, _int vector size_) → _double value_  
 
-__print_vector__(_double *vector_, _int vector size_) → _void_   
+__print\_vector__(_double *vector_, _int vector size_) → _void_   
 
-__print_observations__(_double **observations_, _int observations size_, _int vector size_) → _void_  
+__print\_observations__(_double **observations_, _int observations size_, _int vector size_) → _void_  
 
-__print_clusters__(_double ***clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
+__print\_clusters__(_double ***clusters_, _int k_, _int observations size_, _int vector size_) → _void_  
 &nbsp;
 
 ### Common Lisp
@@ -83,7 +83,7 @@ __innerprod__(_+Vector1_, _+Vector2_, _-Value_)
 
 __norm__(+_Vector_, _-Value_)  
 
-__new_vector__(_+Name_, _+Vector_)  
+__new\_vector__(_+Name_, _+Vector_)  
 &nbsp;
 
 ### Ruby
@@ -164,7 +164,7 @@ CL prompt> (vsum V3 (list 10 0 42))
 (11 2 45)
 
 CL prompt> (defparameter observations
-                         ’((3.0 7.0) (0.5 1.0) (0.8 0.5)
+                         '((3.0 7.0) (0.5 1.0) (0.8 0.5)
                            (1.0 8.0) (0.9 1.2) (6.0 4.0)
                            (7.0 5.5) (4.0 9.0) (9.0 4.0)))
 

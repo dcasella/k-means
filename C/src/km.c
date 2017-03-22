@@ -72,7 +72,8 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 	double **cs = initialize(observations, k, observations_size, vector_size);
 	
 	if (observations_size < k) {
-		printf("Can't compute clusters.");
+		printf("Could not compute clusters.");
+    
 		for (int i = 0; i < k; ++i)
 			free(cs[i]);
 		free(cs);
@@ -87,7 +88,8 @@ double ***km(double **observations, int k, int observations_size, int vector_siz
 		
 		if (compare_clusters(clusters_map, new_clusters_map, observations_size)) {
 			double ***clusters = map_clusters(clusters_map, observations, k, observations_size, vector_size);
-			for (int i = 0; i < k; ++i)
+			
+      for (int i = 0; i < k; ++i)
 				free(cs[i]);
 			free(cs);
 			free(clusters_map);
