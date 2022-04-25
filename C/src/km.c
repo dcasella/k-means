@@ -136,6 +136,7 @@ double *vsum(const double *vector1, const double *vector2, int vector_size) {
 double *vsub(const double *vector1, const double *vector2, int vector_size) {
 	double *vector = (double *) malloc(sizeof(double) * vector_size);
 	
+	#pragma omp parallel for num_threads(vector_size)
 	for (int i = 0; i < vector_size; ++i)
 		vector[i] = vector1[i] - vector2[i];
 	
