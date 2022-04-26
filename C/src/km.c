@@ -227,6 +227,7 @@ double **initialize(double **observations, int k, int observations_size, int vec
 	srand(time(NULL));
 	int r = rand_num(observations_size);
 
+#pragma omp parallel for num_threads(vector_size)
 	for (int i = 0; i < k; ++i)
 	{
 		centroids[i] = (double *)malloc(sizeof(double) * vector_size);
