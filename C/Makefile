@@ -1,4 +1,11 @@
+
+
 CC = gcc -g
+
+# For kevins mac
+#CC = gcc-11 -g 
+
+#Flags -fopenmp & -lsqlite3
 CFLAGS = -Iinclude -fopenmp
 CLINK = -lm -lsqlite3
 OPT =
