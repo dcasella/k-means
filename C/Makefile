@@ -1,6 +1,6 @@
 CC = gcc -g
-CFLAGS = -Iinclude
-CLINK = -lm
+CFLAGS = -Iinclude -fopenmp 
+CLINK = -lm -lsqlite3
 OPT =
 
 main.exe: main.o km.o
