@@ -222,6 +222,7 @@ int *partition(double **observations, double **cs, int k, int observations_size,
 	float curr_distance;
 	int centroid;
 	
+	#pragma omp parallel for num_threads(observations_size)
 	for (int i = 0; i < observations_size; ++i) {
 		float min_distance = DBL_MAX;
 		
