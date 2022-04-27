@@ -1,6 +1,13 @@
+
+
 CC = gcc -g
-CFLAGS = -Iinclude
-CLINK = -lm
+
+# For kevins mac
+#CC = gcc-11 -g 
+
+#Flags -fopenmp & -lsqlite3
+CFLAGS = -Iinclude -fopenmp
+CLINK = -lm -lsqlite3
 OPT =
 
 main.exe: main.o km.o
